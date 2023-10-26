@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="journal_entries_report_id">
+        <t t-call="web.html_container">
+			<t t-call="web.external_layout">
+				<t t-foreach="docs" t-as="o">
+					<div class="page">
+						<p style="page-break-after:always;" />
+						<div>
+							<font style="font-size: 24px;">Asiento Contable</font>
+						</div>
+						<div class="row">
+							<div class="col-3">
+								<span>
+									<strong>Número:</strong>
+									<br/>
+								</span>
+								<span t-field="o.name"/>
+							</div>
+							<div class="col-3">
+								<span>
+									<strong>Fecha:</strong>
+									<br/>
+								</span>
+								<span t-field="o.date"/>
+							</div>
+							<div class="col-3">
+								<span>
+									<strong>Referencia:</strong>
+									<br/>
+								</span>
+								<span t-field="o.ref"/>
+							</div>
+							<div class="col-3">
+								<span>
+									<strong>Nombre del diario:</strong>
+									<br/>
+								</span>
+								<span t-field="o.journal_id.name"/>
+							</div>
+						</div>
+						<table class="table o_report_block_table table-sm h6">
+							<thead >
+								<tr >
+									<th><span>Cuenta</span></th>
+									<th><span>Nombre</span></th>
+									<th><span>Etiqueta</span></th>
+									<th><span>Debe</span></th>
+									<th><span>Haber</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								 <t t-foreach="o.line_ids.sorted(key=lambda line: line.id)" t-as="line">
+									<tr class="small">
+										<td>
+											<span t-field="line.account_id"/>
+										</td>
+										<td>
+											<span t-field="line.partner_id"/>
+										</td>
+										<td>
+											<span t-field="line.name"/>
+										</td>
+										<td style="text-align: right;">
+											<span t-field="line.debit"/>
+										</td>
+										<td style="text-align: right;">
+											<span t-field="line.credit"/>
+										</td>
+									</tr>
+								 </t>
+							</tbody>
+							<tfooter>
+								<tr>
+									<td colspan="2"></td>
+									<td style="text-align: right">Total:</td>
+									<td style="text-align: right;">
+										<span t-field="o.dr_total"/>
+									</td>
+									<td style="text-align: right;">
+										<span t-field="o.cr_total"/>
+									</td>
+								</tr>
+							</tfooter>
+						</table>
+					</div>
+				</t>
+			</t>
+        </t>
+    </template>
+
+    <report
+        id="journal_entries_moce_print_id"
+        model = "account.move"
+        string = "Asientos Contables"
+        report_type = "qweb-pdf"
+        name = "print_journal_entries.journal_entries_report_id"
+        file = "print_journal_entries.journal_entries_report_id"
+    />
+</odoo>
