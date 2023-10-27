@@ -87,15 +87,17 @@ class InvoiceMerge(models.TransientModel):
         aw_obj = self.env["ir.actions.act_window"]
         ids = self.env.context.get("active_ids", [])
         invoices = inv_obj.browse(ids)
-        allinvoices = invoices.do_merge(
-            keep_references=self.keep_references, date_invoice=self.date_invoice
-        )
+        allinvoices = invoices.do_merge(self.keep_references, date_invoice=self.date_invoice)
         xid = {
             "out_invoice": "account.action_move_out_invoice_type",
             "out_refund": "account.action_move_out_refund_type",
             "in_invoice": "account.action_move_in_invoice_type",
             "in_refund": "account.action_move_in_refund_type",
         }[fields.first(invoices).move_type]
+
+        #  Delete original onvoices
+        if not self.keep_references:
+            invoices.unlink()
 
         res = aw_obj._for_xml_id(xid)
         res["domain"] = [("id", "in", ids + list(allinvoices.keys()))]

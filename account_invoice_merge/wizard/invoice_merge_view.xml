@@ -19,11 +19,14 @@
                         currency, journal, salesman, account and type.<br /><br />
                         Lines will only be merged if:<br />
                         * Invoice lines are exactly the same except for the
-                        product, quantity and unit.<br />
+                        product, quantity and unit.<br/><br/>
                     </p>
                 </group>
-                <group name="options">
-                    <field name="keep_references" />
+                <group class="col-md-7">
+                    <span>Desmarca esta opción para eliminar las facturas originales.</span>
+                    <field name="keep_references"/>
+                </group>
+                <group name="options" class="col-md-6">
                     <field name="date_invoice" />
                 </group>
                 <footer>

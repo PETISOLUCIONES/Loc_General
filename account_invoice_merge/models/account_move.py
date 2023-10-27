@@ -17,7 +17,6 @@ class AccountMove(models.Model):
     def _get_invoice_key_cols_out(self):
         return [
             "partner_id",
-            "user_id",
             "move_type",
             "currency_id",
             "journal_id",
