@@ -47,7 +47,7 @@ class ProductTemplate(models.Model):
 
     @api.depends("last_purchase_line_ids")
     def _compute_last_purchase_line_id(self):
-        for item in self.sudo():
+        for item in self.sudo():  # permisos para que busque en todos lo registros sin restricciones de usuario
             item.last_purchase_line_id = fields.first(item.last_purchase_line_ids)
 
     @api.depends("last_purchase_line_id")
