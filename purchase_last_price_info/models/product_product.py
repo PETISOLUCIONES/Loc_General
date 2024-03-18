@@ -19,6 +19,7 @@ class ProductProduct(models.Model):
         comodel_name="purchase.order.line",
         compute="_compute_last_purchase_line_id",
         string="Last Purchase Line",
+        compute_sudo=True,
     )
     last_purchase_price = fields.Float(
         compute="_compute_last_purchase_line_id_info", string="Last Purchase Price"
