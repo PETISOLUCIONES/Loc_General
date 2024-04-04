@@ -19,6 +19,7 @@ class ProductProduct(models.Model):
         comodel_name="purchase.order.line",
         compute="_compute_last_purchase_line_id",
         string="Last Purchase Line",
+        compute_sudo=True,
     )
     last_purchase_price = fields.Float(
         compute="_compute_last_purchase_line_id_info", string="Last Purchase Price"
@@ -52,7 +53,7 @@ class ProductProduct(models.Model):
 
     @api.depends("last_purchase_line_id")
     def _compute_last_purchase_line_id_info(self):
-        for item in self:
+        for item in self.sudo():
             item.last_purchase_price = item.last_purchase_line_id.price_unit
             item.last_purchase_date = item.last_purchase_line_id.date_order
             item.last_purchase_supplier_id = item.last_purchase_line_id.partner_id
