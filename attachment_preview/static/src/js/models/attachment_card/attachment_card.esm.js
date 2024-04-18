@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import AttachmentPreviewWidget from "../../attachmentPreviewWidget.esm";
+import AttachmentPreviewWidget from "@attachment_preview/static/src/js/attachmentPreviewWidget.esm";
 import FormRenderer from "web.FormRenderer";
 import {registerInstancePatchModel} from "@mail/model/model_core";
 
