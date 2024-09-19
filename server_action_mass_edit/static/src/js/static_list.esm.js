@@ -9,7 +9,7 @@ patch(StaticList.prototype, {
         this._onUpdate = options.onUpdate;
 
         this._cache = markRaw({});
-        this._commands = this._commands || [];
+        this._commands = [];
         this._savePoint = undefined;
         this._unknownRecordCommands = {};
         this._currentIds = [...this.resIds];
@@ -28,8 +28,4 @@ patch(StaticList.prototype, {
             (fieldName) => this.activeFields[fieldName].isHandle
         );
     },
-
-    _applyCommands() {
-        this._commands = this._commands || [];
-    }
 });
