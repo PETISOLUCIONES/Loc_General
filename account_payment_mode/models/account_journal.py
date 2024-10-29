@@ -72,3 +72,12 @@ class AccountJournal(models.Model):
                         paymode=mode.name,
                     )
                 )
+
+    @api.depends('outbound_payment_method_line_ids', 'inbound_payment_method_line_ids')
+    def _compute_available_payment_method_ids(self):
+        super()._compute_available_payment_method_ids()
+        outbound_methods = self._default_outbound_payment_methods()
+        inbound_methods = self._default_inbound_payment_methods()
+
+        for journal in self:
+            journal.available_payment_method_ids |= outbound_methods + inbound_methods
