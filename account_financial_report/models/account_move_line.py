@@ -17,8 +17,19 @@ class AccountMoveLine(models.Model):
         # Prefetch all involved analytic accounts
         with_distribution = self.filtered("analytic_distribution")
         batch_by_analytic_account = defaultdict(list)
+        analytic_distribution = {}
         for record in with_distribution:
-            for account_id in map(int, record.analytic_distribution):
+            for key, value in record.analytic_distribution.items():
+                # Si la clave contiene una coma, divídela en varios IDs
+                if ',' in key:
+                    ids = key.split(',')
+                    for account_id in ids:
+                        # Asigna el valor a cada id separado
+                        analytic_distribution[int(account_id)] = value
+                else:
+                    # Si no contiene coma, usa la clave directamente
+                    analytic_distribution[int(key)] = value
+            for account_id in map(int, analytic_distribution):
                 batch_by_analytic_account[account_id].append(record.id)
         existing_account_ids = set(
             self.env["account.analytic.account"]
