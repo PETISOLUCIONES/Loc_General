@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-vendor_registration_request,vendor_registration_request,model_vendor_registration_request,base.group_user,1,1,1,1
-wizard_vendor_register_reject_reason,wizard_vendor_register_reject_reason,model_wizard_vendor_register_reject_reason,base.group_user,1,1,1,1
-vendor_child,vendor_child,model_vendor_child,base.group_user,1,1,1,1
