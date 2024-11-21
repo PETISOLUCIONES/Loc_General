@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="header" name="Header Vendor Request">
+        <li class="nav-item dropdown">
+            <a href="#" role="button" data-bs-toggle="dropdown" class="dropdown-toggle nav-link">
+                <span class="Text">
+                    Vendor Request
+                </span>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu js_usermenu" role="menu" style="padding: 14px 5px;">
+                <li>
+                    <a class="dropdown-item" href="/vendor_req">
+                        Vendor Registration Request
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </template>
+
+    <template id="support_menu_template_header_default" inherit_id="website.template_header_default">
+        <xpath expr="//t[@t-foreach='website.menu_id.child_id']" position="after">
+            <t t-call="bi_vendor_registration_request.header"></t>
+        </xpath>
+    </template>
+
+    <template id="bi_vendor_registration_req" name="Create Vendor Registration Request">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Vendor Request</t>
+            <div id="wrap">
+                <section>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-center mb32 mt32">Vendor Registration Request Form</h1>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="container oe_website_sale vendor_form">
+                    <form t-attf-action="/vendor_req/thankyou" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row o_car_request">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div t-if="error_message" class="alert alert-danger">
+                                            <t t-foreach="error_message" t-as="err">
+                                                <t t-esc="err"/>
+                                                <br/>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 p-0">
+                                        <h3>
+                                            <strong>Vendor Request Form</strong>
+                                        </h3>
+                                    </div>
+
+                                    <div class="col-md-12 p-4">
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and 'type' in error and 'has-error' or ''}">
+                                                <input type="radio" id="individual" name="type" value="individual" required="1"/>
+                                                <label for="individual">Individual</label><br></br>
+                                                <input type="radio" id="company" name="type" value="company"/>
+                                                <label for="company">Company</label><br></br>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and 'vendor_image' in error and 'has-error' or ''}">
+                                                <div class="row">
+                                                    <label class="control-label mb-2" for="file">Upload your profile photo</label>
+                                                    <input type="file" name="file" id="file" class="control-label" value="Choose images"
+                                                    accept="image/*"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and 'user_ids' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="name">Name</label>
+                                                <input type="text" class="form-control" name="user_ids"
+                                                        t-attf-value="#{user_ids or ''}" required="required"/>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and 'email_from' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="email_from">Email</label>
+                                                <input type="text" name="email_from" class="form-control"
+                                                        t-attf-value="#{email or ''}" required="required"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and 'phone' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="phone">Phone</label>
+                                                <input type="text" name="phone" class="form-control"
+                                                        t-attf-value="#{phone or ''}"/>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and 'mobile' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="mobile">Mobile</label>
+                                                <input type="text" name="mobile" class="form-control"
+                                                        t-attf-value="#{mobile or ''}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and 'street' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="street">Street</label>
+                                                <input type="text" name="street" class="form-control"
+                                                        t-attf-value="#{street or ''}"/>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and 'city' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="city">City</label>
+                                                <input type="text" name="city" class="form-control"
+                                                        t-attf-value="#{city or ''}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and 'zipcode' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="zipcode">Zip/Postal Code</label>
+                                                <input type="text" name="zipcode" class="form-control"
+                                                        t-attf-value="#{zipcode or ''}"/>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and 'link' in error and 'has-error' or ''}">
+                                                <label class="control-label" for="link">Website Link</label>
+                                                <input type="text" name="link" class="form-control"
+                                                        t-attf-value="#{link or ''}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2">
+                                            <div t-attf-class="col-4 #{error and error.get('country_id') and 'o_has_error' or ''} div_country">
+                                                <label class="col-form-label" for="country_id">Country</label>
+                                                <select id="country_id" name="country_id" required="required"
+                                                        t-attf-class="form-control #{error and error.get('country_id') and 'is-invalid' or ''}">
+                                                    <option value="">Country...</option>
+                                                    <t t-foreach="request.env['res.country'].search([])" t-as="c">
+                                                        <option t-att-value="c.id"
+                                                                t-att-selected="values and 'country_id' in values and values['country_id']">
+                                                            <t t-esc="c.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                            <div t-attf-class="col-4 #{error and error.get('state_id') and 'o_has_error' or ''} div_country">
+                                                <label class="col-form-label" for="state_id"> State / Province </label>
+                                                <t t-set="state_list" t-value="request.env['res.country.state'].search([])" />
+                                                <select name="state_id" required="required" t-attf-class="form-control #{error and error.get('state_id') and 'is-invalid' or ''}" id="state_id">
+                                                    <option value="">Select State</option>
+                                                    <t t-foreach="state_list or []" t-as="state">
+                                                        <option t-att-value="state.id" t-att-country="state.country_id.id">
+                                                            <t t-esc="state.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row p-2"></div>
+
+                                        <div class="col-md-12 d-none contact_details">
+                                            <div class="col-8">
+                                                <hr/>
+                                                <h3><strong><U>Contact Person Details</U></strong></h3>
+                                                <hr/>
+                                            </div>
+                                            <br/>
+                                            <h4>
+                                                <strong>Contact-1</strong>
+                                            </h4>
+                                            <div class='row p-2'>
+                                                <div t-attf-class="col-4 #{error and 'child_ids1' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="name">Name</label>
+                                                    <input type="text" class="form-control" name="child_ids1"
+                                                            t-attf-value="#{child_ids1 or ''}" />
+                                                </div>
+                                                <div t-attf-class="col-4 #{error and 'email_from1' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="email_from1">Email</label>
+                                                    <input type="text" name="email_from1" class="form-control"
+                                                            t-attf-value="#{email or ''}"/>
+                                                </div>
+                                            </div>
+                                            <div class='row p-2'>
+                                                <div t-attf-class="col-4 #{error and 'phone' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="phone">Phone</label>
+                                                    <input type="text" name="phone1" class="form-control"
+                                                            t-attf-value="#{phone or ''}"/>
+                                                </div>
+                                            </div>
+                                            <br/>
+                                            <br/>
+                                        </div>
+
+                                        <div class="col-md-12 d-none contact_details">
+                                            <div class="col-8">
+                                                <hr/>
+                                                <h3><strong><U>Contact Person Details</U></strong></h3>
+                                                <hr/>
+                                            </div>
+                                            <br/>
+                                            <h4>
+                                                <strong>Contact-2</strong>
+                                            </h4>
+                                            <div class='row p-2'>
+                                                <div t-attf-class="col-4 #{error and 'child_ids2' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="name">Name</label>
+                                                    <input type="text" class="form-control" name="child_ids2"
+                                                            t-attf-value="#{child_ids2 or ''}"/>
+                                                </div>
+                                                <div t-attf-class="col-4 #{error and 'email_from2' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="email_from2">Email</label>
+                                                    <input type="text" name="email_from2" class="form-control"
+                                                            t-attf-value="#{email or ''}"/>
+                                                </div>
+                                            </div>
+                                            <div class='row p-2'>
+                                                <div t-attf-class="col-4 #{error and 'phone' in error and 'has-error' or ''}">
+                                                    <label class="control-label" for="phone">Phone</label>
+                                                    <input type="text" name="phone2" class="form-control"
+                                                            t-attf-value="#{phone or ''}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row p-4 justify-content-center">
+                                            <button type="submit" class="btn btn-primary btn-lg col-4">Vendor Registration Request</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+    
+    <template id="bi_vendor_registration_thank_you" name="Vendor Req Thank You">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <br/>
+                                <h1 class="text-center">Thank You</h1>
+                                <hr></hr>
+                                <h3 class="text-muted text-center">We have successfully created your vendor registration request.<br/>
+                                    will get back to you shortly</h3>
+                            </div>
+                            <a href="/vendor_req" class="btn btn-info col-2 mx-auto">
+                                <span class="fa fa-long-arrow-left"/>
+                                Go Back
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>
