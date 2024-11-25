@@ -227,19 +227,20 @@ class TrialBalanceReport(models.AbstractModel):
 
     @api.model
     def _compute_acc_prt_amount(
-        self, total_amount, tb, acc_id, prt_id, foreign_currency
+            self, total_amount, tb, acc_id, prt_id, foreign_currency
     ):
-        total_amount[acc_id][prt_id] = {}
-        total_amount[acc_id][prt_id]["credit"] = 0.0
-        total_amount[acc_id][prt_id]["debit"] = 0.0
-        total_amount[acc_id][prt_id]["balance"] = 0.0
-        total_amount[acc_id][prt_id]["initial_balance"] = tb["balance"]
-        total_amount[acc_id][prt_id]["ending_balance"] = tb["balance"]
+        acc_id_aux = total_amount.get(acc_id, {})
+        acc_id_aux[prt_id] = {}
+        acc_id_aux[prt_id]["credit"] = 0.0
+        acc_id_aux[prt_id]["debit"] = 0.0
+        acc_id_aux[prt_id]["balance"] = 0.0
+        acc_id_aux[prt_id]["initial_balance"] = tb["balance"]
+        acc_id_aux[prt_id]["ending_balance"] = tb["balance"]
         if foreign_currency:
-            total_amount[acc_id][prt_id]["initial_currency_balance"] = round(
+            acc_id_aux[prt_id]["initial_currency_balance"] = round(
                 tb["amount_currency"], 2
             )
-            total_amount[acc_id][prt_id]["ending_currency_balance"] = round(
+            acc_id_aux[prt_id]["ending_currency_balance"] = round(
                 tb["amount_currency"], 2
             )
         return total_amount
