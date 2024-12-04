@@ -11,6 +11,9 @@
     'website': "http://www.peti.com.co",
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["purchase_stock","purchase_force_invoiced"],
-    "data": ["views/account_invoice_view.xml", "views/purchase_view.xml"],
+    "depends": ["purchase_stock","purchase_force_invoiced","sale_stock", "stock"],
+    "data": ["views/account_invoice_view.xml",
+             "views/purchase_view.xml",
+             "views/sale_view.xml",
+             ],
 }

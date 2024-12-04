@@ -1,7 +1,3 @@
-# Copyright 2017 ForgeFlow S.L. (https://www.forgeflow.com)
-# Copyright 2018 Tecnativa - Pedro M. Baeza
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-
 import collections
 from itertools import groupby
 
@@ -157,7 +153,7 @@ class PurchaseOrder(models.Model):
             # Invoice_ids may be filtered depending on the user. To ensure we get all
             # invoices related to the purchase order, we read them in sudo to fill the
             # cache.
-            self.sudo()._read(["invoice_ids"])
+            self.sudo().read(["invoice_ids"])
             invoices = self.invoice_ids
         refunds = invoices.filtered(lambda x: x.move_type == "in_refund")
         result = self.env["ir.actions.act_window"]._for_xml_id(
@@ -236,6 +232,7 @@ class PurchaseOrderLine(models.Model):
             ["purchase_line_id", "product_uom"],
             lazy=False,
         )
+
         # load all UoM records at once on first access
         uom_ids = {g["product_uom"][0] for g in groups}
         ProductUom.browse(list(uom_ids))  # Prefetching
