@@ -142,16 +142,6 @@ class AutomaticEntryWizard(models.TransientModel):
     _inherit = ['account.automatic.entry.wizard', 'journal.domain.extension.mixin']
 
 
-class AccountBalancePartnerFilter(models.TransientModel):
-    _name = 'account.balance.partner.filter'
-    _inherit = ['account.balance.partner.filter', 'journal.domain.extension.mixin']
-
-
-class account_balance_report_filters(models.TransientModel):
-    _name = 'account.balance.report.filters'
-    _inherit = ['account.balance.report.filters', 'journal.domain.extension.mixin']
-
-
 class AccountBankStatement(models.Model):
     _name = 'account.bank.statement'
     _inherit = ['account.bank.statement', 'journal.domain.extension.mixin']
@@ -190,26 +180,6 @@ class AccountJournal(models.Model):
 class AccountJournalGroup(models.Model):
     _name = 'account.journal.group'
     _inherit = ['account.journal.group', 'journal.domain.extension.mixin']
-
-
-class AccountLoan(models.Model):
-    _name = 'account.loan'
-    _inherit = ['account.loan', 'journal.domain.extension.mixin']
-
-
-class AccountLoanIncreaseAmount(models.TransientModel):
-    _name = 'account.loan.increase.amount'
-    _inherit = ['account.loan.increase.amount', 'journal.domain.extension.mixin']
-
-
-class AccountLoanLine(models.Model):
-    _name = 'account.loan.line'
-    _inherit = ['account.loan.line', 'journal.domain.extension.mixin']
-
-
-class AccountLoanPost(models.TransientModel):
-    _name = 'account.loan.post'
-    _inherit = ['account.loan.post', 'journal.domain.extension.mixin']
 
 
 class AccountMissingTransaction(models.TransientModel):
@@ -302,29 +272,14 @@ class MultiInvoicePayment(models.TransientModel):
     _inherit = ['customer.multi.payments', 'journal.domain.extension.mixin']
 
 
-class DocumentsFolderSetting(models.Model):
-    _name = 'documents.account.folder.setting'
-    _inherit = ['documents.account.folder.setting', 'journal.domain.extension.mixin']
-
-
 class WorkflowActionRule(models.Model):
     _name = 'documents.workflow.rule'
     _inherit = ['documents.workflow.rule', 'journal.domain.extension.mixin']
 
 
-class ExpenseSampleRegister(models.TransientModel):
-    _name = 'expense.sample.register'
-    _inherit = ['expense.sample.register', 'journal.domain.extension.mixin']
-
-
 class GeneralLedgerReportWizard(models.TransientModel):
     _name = 'general.ledger.report.wizard'
     _inherit = ['general.ledger.report.wizard', 'journal.domain.extension.mixin']
-
-
-class hr_closing_configuration_header(models.Model):
-    _name = 'hr.closing.configuration.header'
-    _inherit = ['hr.closing.configuration.header', 'journal.domain.extension.mixin']
 
 
 class HrExpense(models.Model):
@@ -337,49 +292,9 @@ class HrExpenseSheet(models.Model):
     _inherit = ['hr.expense.sheet', 'journal.domain.extension.mixin']
 
 
-class HrLoan(models.Model):
-    _name = 'hr.loan'
-    _inherit = ['hr.loan', 'journal.domain.extension.mixin']
-
-
-class HrLoanType(models.Model):
-    _name = 'hr.loan.type'
-    _inherit = ['hr.loan.type', 'journal.domain.extension.mixin']
-
-
-class HrPayrollAnticipo(models.Model):
-    _name = 'hr.payroll.advance'
-    _inherit = ['hr.payroll.advance', 'journal.domain.extension.mixin']
-
-
-class hr_payroll_flat_file(models.TransientModel):
-    _name = 'hr.payroll.flat.file'
-    _inherit = ['hr.payroll.flat.file', 'journal.domain.extension.mixin']
-
-
-class hr_payroll_posting(models.Model):
-    _name = 'hr.payroll.posting'
-    _inherit = ['hr.payroll.posting', 'journal.domain.extension.mixin']
-
-
-class HrPayrollStructure(models.Model):
-    _name = 'hr.payroll.structure'
-    _inherit = ['hr.payroll.structure', 'journal.domain.extension.mixin']
-
-
-class ImportXML(models.TransientModel):
-    _name = 'import.xml'
-    _inherit = ['import.xml', 'journal.domain.extension.mixin']
-
-
 class JournalLedgerReportWizard(models.TransientModel):
     _name = 'journal.ledger.report.wizard'
     _inherit = ['journal.ledger.report.wizard', 'journal.domain.extension.mixin']
-
-
-class nom_payroll_flat_file_backup(models.Model):
-    _name = 'nom.payroll.flat.file.backup'
-    _inherit = ['nom.payroll.flat.file.backup', 'journal.domain.extension.mixin']
 
 
 class PaymentProvider(models.Model):
@@ -437,16 +352,6 @@ class SaleOrder(models.Model):
     _inherit = ['sale.order', 'journal.domain.extension.mixin']
 
 
-class SaleOrderTemplate(models.Model):
-    _name = 'sale.order.template'
-    _inherit = ['sale.order.template', 'journal.domain.extension.mixin']
-
-
-class StockLandedCost(models.Model):
-    _name = 'stock.landed.cost'
-    _inherit = ['stock.landed.cost', 'journal.domain.extension.mixin']
-
-
 class StockValuationLayerRevaluation(models.TransientModel):
     _name = 'stock.valuation.layer.revaluation'
     _inherit = ['stock.valuation.layer.revaluation', 'journal.domain.extension.mixin']
@@ -465,3 +370,98 @@ class TrialBalanceReport(models.TransientModel):
 class TrialBalanceReportWizard(models.TransientModel):
     _name = 'trial.balance.report.wizard'
     _inherit = ['trial.balance.report.wizard', 'journal.domain.extension.mixin']
+
+
+# class AccountBalancePartnerFilter(models.TransientModel):
+#     _name = 'account.balance.partner.filter'
+#     _inherit = ['account.balance.partner.filter', 'journal.domain.extension.mixin']
+
+
+# class account_balance_report_filters(models.TransientModel):
+#     _name = 'account.balance.report.filters'
+#     _inherit = ['account.balance.report.filters', 'journal.domain.extension.mixin']
+
+
+# class AccountLoan(models.Model):
+#     _name = 'account.loan'
+#     _inherit = ['account.loan', 'journal.domain.extension.mixin']
+
+
+# class AccountLoanIncreaseAmount(models.TransientModel):
+#     _name = 'account.loan.increase.amount'
+#     _inherit = ['account.loan.increase.amount', 'journal.domain.extension.mixin']
+
+
+# class AccountLoanLine(models.Model):
+#     _name = 'account.loan.line'
+#     _inherit = ['account.loan.line', 'journal.domain.extension.mixin']
+
+
+# class AccountLoanPost(models.TransientModel):
+#     _name = 'account.loan.post'
+#     _inherit = ['account.loan.post', 'journal.domain.extension.mixin']
+
+
+# class DocumentsFolderSetting(models.Model):
+#     _name = 'documents.account.folder.setting'
+#     _inherit = ['documents.account.folder.setting', 'journal.domain.extension.mixin']
+
+
+# class ExpenseSampleRegister(models.TransientModel):
+#     _name = 'expense.sample.register'
+#     _inherit = ['expense.sample.register', 'journal.domain.extension.mixin']
+
+
+# class hr_closing_configuration_header(models.Model):
+#     _name = 'hr.closing.configuration.header'
+#     _inherit = ['hr.closing.configuration.header', 'journal.domain.extension.mixin']
+
+
+# class nom_payroll_flat_file_backup(models.Model):
+#     _name = 'nom.payroll.flat.file.backup'
+#     _inherit = ['nom.payroll.flat.file.backup', 'journal.domain.extension.mixin']
+
+
+# class HrLoan(models.Model):
+#     _name = 'hr.loan'
+#     _inherit = ['hr.loan', 'journal.domain.extension.mixin']
+
+
+# class HrLoanType(models.Model):
+#     _name = 'hr.loan.type'
+#     _inherit = ['hr.loan.type', 'journal.domain.extension.mixin']
+
+
+# class HrPayrollAnticipo(models.Model):
+#     _name = 'hr.payroll.advance'
+#     _inherit = ['hr.payroll.advance', 'journal.domain.extension.mixin']
+
+
+# class hr_payroll_flat_file(models.TransientModel):
+#     _name = 'hr.payroll.flat.file'
+#     _inherit = ['hr.payroll.flat.file', 'journal.domain.extension.mixin']
+
+
+# class hr_payroll_posting(models.Model):
+#     _name = 'hr.payroll.posting'
+#     _inherit = ['hr.payroll.posting', 'journal.domain.extension.mixin']
+
+
+# class HrPayrollStructure(models.Model):
+#     _name = 'hr.payroll.structure'
+#     _inherit = ['hr.payroll.structure', 'journal.domain.extension.mixin']
+
+
+# class ImportXML(models.TransientModel):
+#     _name = 'import.xml'
+#     _inherit = ['import.xml', 'journal.domain.extension.mixin']
+
+
+# class SaleOrderTemplate(models.Model):
+#     _name = 'sale.order.template'
+#     _inherit = ['sale.order.template', 'journal.domain.extension.mixin']
+
+
+# class StockLandedCost(models.Model):
+#     _name = 'stock.landed.cost'
+#     _inherit = ['stock.landed.cost', 'journal.domain.extension.mixin']
