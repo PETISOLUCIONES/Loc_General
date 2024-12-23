@@ -1,13 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Añadir campo de diarios habilitados en la vista de usuario -->
     <record id="view_authorized_journals_form" model="ir.ui.view">
         <field name="name">res.users.form.inherit.authorized.journals</field>
         <field name="model">res.users</field>
-        <!--<field name="mode">extension</field>-->
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@class='oe_title']//field[@name='partner_id']" position="after">
-                <field name="account_journal_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                <field name="enable_journals_per_user" invisible="1"/>
+                <field name="account_journal_ids" widget="many2many_tags" options="{'no_create': True}" invisible="not enable_journals_per_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Añadir configuración general de diarios habilitados -->
+    <record id="res_config_settings_view_form_inherit_account_journal" model="ir.ui.view">
+        <field name="name">res.config.settings.view.inherit.account.journal</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/app[@name='account']/block[1]" position="before">
+                <block title="Diarios habilitados" class="text-nowrap">
+                        <div class="col-12 col-lg-12 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Diarios habilitados</span>
+                                <div class="text-muted">
+                                    Limitar la cantidad máxima de diarios que un usuario puede tener habilitados.
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label string="Habilitar limite de diarios por usuario" for="enable_journals_per_user" class="col-lg-4 o_light_label"/>
+                                        <field name="enable_journals_per_user" widget="boolean_toggle"/>
+                                        <label string="Cantidad máxima de diarios por usuario" for="journals_per_user" class="col-lg-4 o_light_label" invisible="not enable_journals_per_user"/>
+                                        <field name="journals_per_user" invisible="not enable_journals_per_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </block>
             </xpath>
         </field>
     </record>
