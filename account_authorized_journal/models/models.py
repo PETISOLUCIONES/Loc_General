@@ -17,14 +17,6 @@ class ResCompany(models.Model):
         readonly=False
     )
 
-    journals_per_user = fields.Integer(
-        string='Cantidad máxima de diarios por usuario',
-        help="Cantidad máxima de diarios que un usuario puede tener habilitados.",
-        default=2,
-        required=False,
-        readonly=False
-    )
-
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -35,14 +27,6 @@ class ResConfigSettings(models.TransientModel):
         required=False,
         readonly=False,
         related='company_id.enable_journals_per_user'
-    )
-
-    journals_per_user = fields.Integer(
-        string='Cantidad máxima de diarios por usuario',
-        help="Cantidad máxima de diarios que un usuario puede tener habilitados.",
-        required=False,
-        readonly=False,
-        related='company_id.journals_per_user'
     )
 
 
@@ -61,20 +45,6 @@ class ResUsers(models.Model):
         comodel_name='account.journal',
         string='Diarios habilitados'
     )
-
-    @api.constrains('account_journal_ids')
-    def _check_number_of_journals(self):
-        # Obtener la configuración de la compañía
-        enable_journals_per_user = self.env.user.company_id.enable_journals_per_user
-        if enable_journals_per_user:
-            # Validar la cantidad máxima de diarios por usuario
-            journals_per_user = self.env.user.company_id.journals_per_user
-            for user in self:
-                if len(user.account_journal_ids) > journals_per_user:
-                    raise ValidationError(
-                        f"\nNo puede asignar más de %s diario(s) por usuario."
-                        f"\n\nPor favor, verifique la configuración de la compañía." % journals_per_user
-                    )
 
 
 class JournalDomainExtensionMixin(models.AbstractModel):
@@ -97,14 +67,12 @@ class JournalDomainExtensionMixin(models.AbstractModel):
                     journals_per_user = self.env.user.account_journal_ids.ids
                     if bool(journals_per_user):
                         domain = "('id', 'in', %s)" % journals_per_user
-                    else:
-                        domain = "('id', 'in', [])"
-                    if 'domain' in field_attrs and field_attrs['domain']:
-                        # Combinar dominios existentes si es necesario
-                        field_attrs['domain'] = f"({field_attrs['domain']}) + ([{domain}])"
-                    else:
-                        # Asignar el nuevo dominio
-                        field_attrs['domain'] = f"[{domain}]"
+                        if 'domain' in field_attrs and field_attrs['domain']:
+                            # Combinar dominios existentes si es necesario
+                            field_attrs['domain'] = f"({field_attrs['domain']}) + ([{domain}])"
+                        else:
+                            # Asignar el nuevo dominio
+                            field_attrs['domain'] = f"[{domain}]"
         return res
 
     def _get_view(self, view_id=None, view_type='form', **options):
@@ -122,25 +90,23 @@ class JournalDomainExtensionMixin(models.AbstractModel):
                 # Preparar la condición adicional del dominio
                 if bool(journals_per_user):
                     extra_condition = "('id', 'in', %s)" % journals_per_user
-                else:
-                    extra_condition = "('id', 'in', [])"
-                # Obtener la información de todos los campos del modelo
-                fields_info = self.fields_get()
-                # Recorrer todos los campos para identificar aquellos que apuntan a account.journal
-                for field_name, field_attrs in fields_info.items():
-                    field_type = field_attrs.get('type')
-                    field_relation = field_attrs.get('relation')
-                    # Verificar si el campo es una relación con account.journal
-                    if field_type in ['many2one', 'many2many', 'one2many'] and field_relation == 'account.journal':
-                        # Buscar este campo en la vista
-                        field_nodes = arch.xpath("//field[@name='%s']" % field_name)
-                        for field_node in field_nodes:
-                            current_domain_str = field_node.get('domain')
-                            if current_domain_str:
-                                # Si ya existía un dominio, agregar la condición al final
-                                final_domain_str = "[(" + current_domain_str[1:-1] + "), " + extra_condition + "]"
-                                # Asignar el dominio combinado al campo en la vista
-                                field_node.set('domain', final_domain_str)
+                    # Obtener la información de todos los campos del modelo
+                    fields_info = self.fields_get()
+                    # Recorrer todos los campos para identificar aquellos que apuntan a account.journal
+                    for field_name, field_attrs in fields_info.items():
+                        field_type = field_attrs.get('type')
+                        field_relation = field_attrs.get('relation')
+                        # Verificar si el campo es una relación con account.journal
+                        if field_type in ['many2one', 'many2many', 'one2many'] and field_relation == 'account.journal':
+                            # Buscar este campo en la vista
+                            field_nodes = arch.xpath("//field[@name='%s']" % field_name)
+                            for field_node in field_nodes:
+                                current_domain_str = field_node.get('domain')
+                                if current_domain_str:
+                                    # Si ya existía un dominio, agregar la condición al final
+                                    final_domain_str = "[(" + current_domain_str[1:-1] + "), " + extra_condition + "]"
+                                    # Asignar el dominio combinado al campo en la vista
+                                    field_node.set('domain', final_domain_str)
         # Retornar la vista modificada
         return arch, view
 
@@ -154,18 +120,19 @@ class JournalDomainExtensionMixin(models.AbstractModel):
         if enable_journals_per_user:
             # Validar que los diarios asignados al usuario actual sean válidos
             journals_per_user = self.env.user.account_journal_ids
-            fields_info = self.fields_get()
-            for field_name, field_attrs in fields_info.items():
-                # Verificar si el campo es de tipo relación y está relacionado con account.journal
-                if field_attrs.get('type') in ['many2one', 'many2many', 'one2many'] and field_attrs.get('relation') == 'account.journal':
-                    # Validar que los diarios asignados al usuario actual sean válidos
-                    if field_name in vals and vals[field_name] and vals[field_name] not in journals_per_user.ids:
-                        journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
-                        raise ValidationError(
-                            f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
-                            f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
-                            # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
-                        )
+            if bool(journals_per_user):
+                fields_info = self.fields_get()
+                for field_name, field_attrs in fields_info.items():
+                    # Verificar si el campo es de tipo relación y está relacionado con account.journal
+                    if field_attrs.get('type') in ['many2one', 'many2many', 'one2many'] and field_attrs.get('relation') == 'account.journal':
+                        # Validar que los diarios asignados al usuario actual sean válidos
+                        if field_name in vals and vals[field_name] and vals[field_name] not in journals_per_user.ids:
+                            journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
+                            raise ValidationError(
+                                f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
+                                f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
+                                # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
+                            )
         # Retornar el resultado del método original de la superclase
         return super(JournalDomainExtensionMixin, self).create(vals)
 
@@ -178,18 +145,19 @@ class JournalDomainExtensionMixin(models.AbstractModel):
         if enable_journals_per_user:
             # Validar que los diarios asignados al usuario actual sean válidos
             journals_per_user = self.env.user.account_journal_ids
-            fields_info = self.fields_get()
-            for field_name, field_attrs in fields_info.items():
-                # Verificar si el campo es de tipo relación y está relacionado con account.journal
-                if field_attrs.get('type') in ['many2one', 'many2many', 'one2many'] and field_attrs.get('relation') == 'account.journal':
-                    # Validar que los diarios asignados al usuario actual sean válidos
-                    if field_name in vals and vals[field_name] and vals[field_name] not in journals_per_user.ids:
-                        journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
-                        raise ValidationError(
-                            f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
-                            f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
-                            # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
-                        )
+            if bool(journals_per_user):
+                fields_info = self.fields_get()
+                for field_name, field_attrs in fields_info.items():
+                    # Verificar si el campo es de tipo relación y está relacionado con account.journal
+                    if field_attrs.get('type') in ['many2one', 'many2many', 'one2many'] and field_attrs.get('relation') == 'account.journal':
+                        # Validar que los diarios asignados al usuario actual sean válidos
+                        if field_name in vals and vals[field_name] not in journals_per_user.ids:
+                            journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
+                            raise ValidationError(
+                                f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
+                                f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
+                                # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
+                            )
         # Llamar al método original de la superclase
         return super(JournalDomainExtensionMixin, self).write(vals)
 

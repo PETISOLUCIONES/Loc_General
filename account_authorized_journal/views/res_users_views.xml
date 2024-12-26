@@ -32,8 +32,6 @@
                                     <div class="row mt16">
                                         <label string="Habilitar limite de diarios por usuario" for="enable_journals_per_user" class="col-lg-4 o_light_label"/>
                                         <field name="enable_journals_per_user" widget="boolean_toggle"/>
-                                        <label string="Cantidad máxima de diarios por usuario" for="journals_per_user" class="col-lg-4 o_light_label" invisible="not enable_journals_per_user"/>
-                                        <field name="journals_per_user" invisible="not enable_journals_per_user"/>
                                     </div>
                                 </div>
                             </div>
