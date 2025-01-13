@@ -297,11 +297,6 @@ class BankRecWidget(models.Model):
     _inherit = ['bank.rec.widget', 'journal.domain.extension.mixin']
 
 
-class CommissionMakeInvoice(models.TransientModel):
-    _name = 'commission.make.invoice'
-    _inherit = ['commission.make.invoice', 'journal.domain.extension.mixin']
-
-
 class MultiInvoicePayment(models.TransientModel):
     _name = 'customer.multi.payments'
     _inherit = ['customer.multi.payments', 'journal.domain.extension.mixin']
@@ -395,6 +390,15 @@ class TrialBalanceReport(models.TransientModel):
 class TrialBalanceReportWizard(models.TransientModel):
     _name = 'trial.balance.report.wizard'
     _inherit = ['trial.balance.report.wizard', 'journal.domain.extension.mixin']
+
+
+"""
+Solo aplica para Hoyostools (Repositorio de comisiones > Módulo account_commission)
+"""
+
+# class CommissionMakeInvoice(models.TransientModel):
+#     _name = 'commission.make.invoice'
+#     _inherit = ['commission.make.invoice', 'journal.domain.extension.mixin']
 
 
 """
