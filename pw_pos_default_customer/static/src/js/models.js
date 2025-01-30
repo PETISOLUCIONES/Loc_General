@@ -8,7 +8,7 @@ import { patch } from "@web/core/utils/patch";
 patch(Order.prototype, {
     setup() {
         super.setup(...arguments);
-        if (this.pos.config.pos_customer_id) {
+        if (this.pos.config.pos_customer_id && !this.get_partner()) {
             var default_customer = this.pos.config.pos_customer_id[0];
             var partner = this.pos.db.get_partner_by_id(default_customer);
             this.set_partner(partner);
