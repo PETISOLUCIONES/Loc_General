@@ -15,14 +15,17 @@ class ResPartner(models.Model):
     @api.constrains("vat", "parent_id")
     def _check_vat_unique(self):
         for record in self:
-            if record.parent_id or not record.vat:
+            # Si tiene un padre o no tiene identificación
+            if bool(record.parent_id) or not bool(record.vat):
                 continue
-            test_condition = config["test_enable"] and not self.env.context.get(
-                "test_vat"
-            )
-            if test_condition:
+            # Si se está importando maestras
+            from_import = self.env.context.get("import_file")
+            if bool(from_import):
                 continue
-            if record.same_vat_partner_id:
-                raise ValidationError(
-                    _("The VAT %s already exists in another partner.") % record.vat
-                )
+            # Si se está en etapa de pruebas
+            test_condition = config["test_enable"] and not self.env.context.get("test_vat")
+            if bool(test_condition):
+                continue
+            # Si hay contactos con la misma identificación (_compute_same_vat_partner_id)
+            if bool(record.same_vat_partner_id):
+                raise ValidationError(_("The VAT %s already exists in another partner.") % record.vat)
