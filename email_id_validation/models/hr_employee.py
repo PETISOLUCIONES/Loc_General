@@ -28,7 +28,7 @@ class HrEmployee(models.Model):
     record is saved"""
     _inherit = 'hr.employee'
 
-    @api.constrains('work_email')
+    @api.onchange('work_email')
     def _check_work_email(self):
         """
         Check the work email is valid or not
@@ -37,7 +37,10 @@ class HrEmployee(models.Model):
             is_valid = validate_email(self.work_email, check_mx=False,
                                       verify=True, debug=False,
                                       smtp_timeout=10)
-            if is_valid is not True:
-                raise ValidationError(_('You can use only valid email address.'
-                                        'Email address "%s" is invalid '
-                                        'or does not exist') % self.work_email)
+            if not is_valid:
+                warning = {
+                    'title': _('Advertencia de validación de correo electrónico'),
+                    'message': _('La dirección de correo electrónico "%s" parece no ser válida o no existe. '
+                                 ) % self.work_email
+                }
+                return {'warning': warning}
