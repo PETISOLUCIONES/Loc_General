@@ -28,15 +28,19 @@ class ResPartner(models.Model):
     record is saved"""
     _inherit = 'res.partner'
 
-    @api.constrains('email')
+    @api.onchange('email')
     def _check_email(self):
         """
-        Check the email is valid or not
+        Show warning if email is invalid but allow saving
         """
         if self.email:
             is_valid = validate_email(self.email, check_mx=False, verify=True,
                                       debug=False, smtp_timeout=10)
-            if is_valid is not True:
-                raise ValidationError(_('You can use only valid email address.'
-                                        'Email address "%s" is invalid '
-                                        'or does not exist') % self.email)
+
+            if not is_valid:
+                warning = {
+                    'title': _('Email Validation Warning'),
+                    'message': _('The email address "%s" appears to be invalid or does not exist. '
+                                 'You can save the record, but please verify the email address.') % self.email
+                }
+                return {'warning': warning}
