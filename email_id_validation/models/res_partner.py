@@ -39,8 +39,8 @@ class ResPartner(models.Model):
 
             if not is_valid:
                 warning = {
-                    'title': _('Email Validation Warning'),
-                    'message': _('The email address "%s" appears to be invalid or does not exist. '
-                                 'You can save the record, but please verify the email address.') % self.email
+                    'title': _('Advertencia de validación de correo electrónico'),
+                    'message': _('La dirección de correo electrónico "%s" parece no ser válida o no existe. '
+                                 'Puede guardar el registro, pero verifique la dirección de correo electrónico.') % self.email
                 }
                 return {'warning': warning}
