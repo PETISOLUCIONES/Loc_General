@@ -53,7 +53,7 @@ msgstr "Secuencia máxima en líneas"
 #. module: sale_order_line_sequence
 #: model:ir.model.fields,field_description:sale_order_line_sequence.field_account_move_line__related_so_sequence
 msgid "SO Line Number"
-msgstr "Número de Línea de SO"
+msgstr "Número"
 
 #. module: sale_order_line_sequence
 #: model:ir.model,name:sale_order_line_sequence.model_sale_order

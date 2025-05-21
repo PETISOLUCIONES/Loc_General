@@ -16,6 +16,6 @@
         "views/account_move_view.xml",
         "views/report_invoice.xml",
     ],
-    "depends": ["sale"],
+    "depends": ["sale","facturacion_electronica"],
     "installable": True,
 }

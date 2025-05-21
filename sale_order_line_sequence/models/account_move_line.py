@@ -8,17 +8,32 @@ class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     related_so_sequence = fields.Char(
-        string="SO Line Number",
-        compute="_compute_related_so_sequence",
+        string="#",
+        help="Número de línea.",
     )
 
-    @api.depends("move_id.invoice_line_ids")
-    def _compute_related_so_sequence(self):
-        for rec in self:
-            if len(rec.move_id.mapped("line_ids.sale_line_ids.order_id")) > 1:
-                rec.related_so_sequence = "{}/{}".format(
-                    rec.sale_line_ids.order_id.name,
-                    rec.sale_line_ids.visible_sequence,
-                )
-            else:
-                rec.related_so_sequence = str(rec.sale_line_ids.visible_sequence)
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super().create(vals_list)
+        lines._set_related_so_sequence()
+        return lines
+
+    def _set_related_so_sequence(self):
+        secuencia = 1
+        for line in self:
+            line.related_so_sequence = secuencia
+            secuencia += 1
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    def get_dict_lineas_fact(self):
+        datos = super(AccountMove, self).get_dict_lineas_fact()
+        self.invoice_line_ids._set_related_so_sequence()
+        for i, line in enumerate(self.invoice_line_ids.sorted(key=lambda l: l.price_subtotal, reverse=True),  start=0):
+            if line.display_type != 'line_section' and line.display_type != 'line_note':
+                try:
+                    datos['datos'][i]['NumItem'] = line.related_so_sequence if line.related_so_sequence else 0
+                except:
+                    pass
+        return datos
