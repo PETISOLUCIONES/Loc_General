@@ -24,16 +24,16 @@ class AccountMoveLine(models.Model):
             line.related_so_sequence = secuencia
             secuencia += 1
 
+    def get_invoice_line_dict(self, index):
+        line_dict = super(AccountMoveLine, self).get_invoice_line_dict(index)
+        if line_dict and self.related_so_sequence:
+            line_dict['NumItem'] = self.related_so_sequence
+        return line_dict
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
     def get_dict_lineas_fact(self):
-        datos = super(AccountMove, self).get_dict_lineas_fact()
         self.invoice_line_ids._set_related_so_sequence()
-        for i, line in enumerate(self.invoice_line_ids.sorted(key=lambda l: l.price_subtotal, reverse=True),  start=0):
-            if line.display_type != 'line_section' and line.display_type != 'line_note':
-                try:
-                    datos['datos'][i]['NumItem'] = line.related_so_sequence if line.related_so_sequence else 0
-                except:
-                    pass
-        return datos
+        data = super(AccountMove, self).get_dict_lineas_fact()
+        return data
