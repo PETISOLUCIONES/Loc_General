@@ -2,6 +2,27 @@
 <!-- Copyright 2017 ForgeFlow S.L.
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
+
+    <record id="purchase_order_form_view_inherit_importations" model="ir.ui.view">
+        <field name="name">purchase.order.form.view.inherit.importation</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="hide_reviews" invisible="1"/>
+                <field name="need_validation" invisible="1"/>
+                <field name="validated" invisible="1"/>
+                <field name="rejected" invisible="1"/>
+                <field name="can_review" invisible="1"/>
+                <field name="next_review" invisible="1"/>
+                <field name="review_ids" invisible="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
     <record id="view_purchase_order_filter" model="ir.ui.view">
         <field name="name">purchase.order.select - purchase_tier_validation</field>
         <field name="model">purchase.order</field>
