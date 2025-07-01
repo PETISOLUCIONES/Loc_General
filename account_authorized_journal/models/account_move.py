@@ -34,7 +34,8 @@ class AccountMove(models.Model):
     def fields_get(self, allfields=None, attributes=None):
         res = super().fields_get(allfields=allfields, attributes=attributes)
         enable_journals_per_user = self.env.user.company_id.enable_journals_per_user
-        if enable_journals_per_user and 'journal_id' in res:
+        has_group = self.env.user.has_group('account_authorized_journal.group_journal_limits')
+        if enable_journals_per_user and has_group and 'journal_id' in res:
             allowed = self.env.user.account_journal_ids.ids
             if allowed:
                 extra = f"('id','in',{allowed})"
@@ -50,7 +51,8 @@ class AccountMove(models.Model):
     def _get_view(self, view_id=None, view_type='form', **options):
         arch, view = super()._get_view(view_id=view_id, view_type=view_type, **options)
         enable_journals_per_user = self.env.user.company_id.enable_journals_per_user
-        if enable_journals_per_user and view_type in ('form', 'tree'):
+        has_group = self.env.user.has_group('account_authorized_journal.group_journal_limits')
+        if enable_journals_per_user and has_group and view_type in ('form', 'tree'):
             allowed = self.env.user.account_journal_ids.ids
             if allowed:
                 extra = f"('id','in',{allowed})"
