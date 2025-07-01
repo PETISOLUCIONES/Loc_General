@@ -43,7 +43,7 @@ class ResUsers(models.Model):
 
     account_journal_ids = fields.Many2many(
         comodel_name='account.journal',
-        string='Diarios habilitados'
+        string='Diarios habilitados',
     )
 
 
@@ -129,7 +129,7 @@ class JournalDomainExtensionMixin(models.AbstractModel):
                         if field_name in vals and vals[field_name] and vals[field_name] not in journals_per_user.ids:
                             journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
                             raise ValidationError(
-                                f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
+                                f"\nNo tiene permiso para usar el diario '{journal and journal.name or vals[field_name]}'."
                                 f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
                                 # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
                             )
@@ -154,7 +154,15 @@ class JournalDomainExtensionMixin(models.AbstractModel):
                         if field_name in vals and vals[field_name] not in journals_per_user.ids:
                             journal = self.env['account.journal'].browse(vals[field_name]) if isinstance(vals[field_name], int) else False
                             raise ValidationError(
-                                f"\nNo tiene permiso para seleccionar el diario '{journal and journal.name or vals[field_name]}'."
+                                f"\nNo tiene permiso para usar el diario '{journal and journal.name or vals[field_name]}'."
+                                f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
+                                # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
+                            )
+                        # Validar que los diarios asignados al usuario actual sean válidos
+                        elif not field_name in vals and self[field_name] and self[field_name] not in journals_per_user:
+                            journal = self[field_name]
+                            raise ValidationError(
+                                f"\nNo tiene permiso para usar el diario '{journal and journal.name or self[field_name]}'."
                                 f"\n\nSus diarios habilitados son: {(', '.join(j.name for j in journals_per_user)) or 'Ninguno'}"
                                 # f"\n\nEsta restricción se aplica a través del modelo {self._description}."
                             )
