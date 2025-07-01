@@ -3,7 +3,7 @@
     <data noupdate="0">
         <!-- Grupo de limite de diarios -->
         <record id="group_journal_limits" model="res.groups">
-            <field name="name">Límites de Diarios</field>
+            <field name="name">Diarios habilitados</field>
             <field name="category_id" ref="base.module_category_accounting"/>
         </record>
 
