@@ -13,7 +13,7 @@
     'license': 'OPL-1',
     'depends': [
         'base',
-        'account',
+        'account','bi_cs_multiple_payment'
     ],
     'data': [
         'security/groups.xml',
