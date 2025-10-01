@@ -11,5 +11,16 @@
         <record id="base.group_user" model="res.groups">
             <field name="implied_ids" eval="[(4, ref('account_authorized_journal.group_journal_limits'))]"/>
         </record>
+
+
+        <!-- Grupo de limite de diarios -->
+        <record id="group_journal_alls" model="res.groups">
+            <field name="name">Todos los diarios</field>
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="implied_ids" eval="[(4, ref('account_authorized_journal.group_journal_limits'))]"/>
+        </record>
+
+
+
     </data>
 </odoo>

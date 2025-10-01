@@ -7,18 +7,18 @@
             <field name="model_id" ref="account.model_account_journal"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_limits'))]"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_alls'))]"/>
         </record>
 
         <record id="rule_journal_crear_editar_permitidos" model="ir.rule">
-            <field name="name">Crear/Editar/Eliminar diarios permitidos</field>
+            <field name="name">Diarios permitidos</field>
             <field name="model_id" ref="account.model_account_journal"/>
             <field name="domain_force">user.account_journal_ids and [('id', 'in', user.account_journal_ids.ids)] or [(1,'=',1)]</field>
             <!--<field name="domain_force">[('allowed_for_user', '=', True)]</field>-->
-            <field name="perm_read" eval="False"/>
+            <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
@@ -31,18 +31,42 @@
             <field name="model_id" ref="account.model_account_move"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
-            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_limits'))]"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_alls'))]"/>
         </record>
 
         <record id="rule_move_crear_editar_eliminar_permitidos" model="ir.rule">
-            <field name="name">Crear/Editar/Eliminar asientos permitidos</field>
+            <field name="name">Asientos permitidos</field>
             <field name="model_id" ref="account.model_account_move"/>
             <field name="domain_force">user.account_journal_ids and [('journal_id', 'in', user.account_journal_ids.ids)] or [(1,'=',1)]</field>
             <!--<field name="domain_force">[('allowed_journal', '=', True)]</field>-->
-            <field name="perm_read" eval="False"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_limits'))]"/>
+        </record>
+
+        <!-- Reglas para account.payment -->
+        <record id="rule_payment_leer_todos" model="ir.rule">
+            <field name="name">Lectura de todos los pagos</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('account_authorized_journal.group_journal_alls'))]"/>
+        </record>
+
+        <record id="rule_payment_crear_editar_eliminar_permitidos" model="ir.rule">
+            <field name="name">Pagos de diarios permitidos</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">user.account_journal_ids and [('journal_id', 'in', user.account_journal_ids.ids)] or [(1,'=',1)]</field>
+            <!--<field name="domain_force">[('allowed_journal', '=', True)]</field>-->
+            <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
