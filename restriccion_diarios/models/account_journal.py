@@ -102,7 +102,7 @@ class ShAccountJournalRestrict(models.Model):
         # Verifica si aplicar restricciones
         if (
             self.env.user.has_group("restriccion_diarios.group_journal_restrict_feature") and not
-            (self.env.user.has_group("base.group_erp_manager"))
+            (self.env.user.has_group("restriccion_diarios.group_access_of_assign_user"))
         ):
             # Usuario tiene restricciones: filtrar por user_ids
             sh_domain = [
@@ -163,7 +163,7 @@ class ShAccountJournalRestrict(models.Model):
         # Verifica si aplicar restricciones
         if (
             self.env.user.has_group("restriccion_diarios.group_journal_restrict_feature") and not
-            (self.env.user.has_group("base.group_erp_manager"))
+            (self.env.user.has_group("restriccion_diarios.group_access_of_assign_user"))
         ):
             # Usuario tiene restricciones: agregar filtro al domain
             domain += [
