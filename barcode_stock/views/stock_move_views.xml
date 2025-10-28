@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2017-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- "License URL : <https://store.webkul.com/license.html/>" -->
+<odoo>
+    <!-- Vista tree para los movimientos dentro del picking -->
+    <record id="view_move_picking_tree_inherit_barcode" model="ir.ui.view">
+        <field name="name">stock.move.picking.tree.inherit.barcode</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_picking_move_tree"/>
+        <field name="arch" type="xml">
+            <!-- Agregar decoración verde cuando last_scanned es True -->
+            <tree position="attributes">
+                <attribute name="decoration-success">last_scanned</attribute>
+            </tree>
+            <!-- Agregar el campo last_scanned invisible para que la decoración funcione -->
+            <xpath expr="//tree/field[1]" position="before">
+                <field name="last_scanned" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista kanban para los movimientos -->
+    <record id="view_move_kanban_inherit_barcode" model="ir.ui.view">
+        <field name="name">stock.move.kanban.inherit.barcode</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_kandan"/>
+        <field name="arch" type="xml">
+            <!-- Agregar decoración verde cuando last_scanned es True -->
+            <kanban position="attributes">
+                <attribute name="decoration-success">last_scanned</attribute>
+            </kanban>
+            <!-- Agregar los campos invisibles para que la decoración funcione -->
+            <field name="location_id" position="after">
+                <field name="last_scanned"/>
+                <field name="is_scanned"/>
+            </field>
+        </field>
+    </record>
+</odoo>

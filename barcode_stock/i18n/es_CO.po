@@ -1,0 +1,102 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* barcode_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-28 12:00:00\n"
+"PO-Revision-Date: 2025-01-28 12:00:00\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: es_CO\n"
+
+#. module: barcode_stock
+#: model:ir.model.fields,field_description:barcode_stock.field_stock_move_line__is_scanned
+#: model:ir.model.fields,field_description:barcode_stock.field_stock_move__is_scanned
+msgid "Scanned"
+msgstr "Escaneado"
+
+#. module: barcode_stock
+#: model:ir.model.fields,help:barcode_stock.field_stock_move_line__is_scanned
+msgid "Indica si esta línea ha sido escaneada con el lector de código de barras"
+msgstr "Indica si esta línea ha sido escaneada con el lector de código de barras"
+
+#. module: barcode_stock
+#: model:ir.model.fields,field_description:barcode_stock.field_stock_move_line__last_scanned
+#: model:ir.model.fields,field_description:barcode_stock.field_stock_move__last_scanned
+msgid "Last Scanned"
+msgstr "Último Escaneado"
+
+#. module: barcode_stock
+#: model:ir.model.fields,help:barcode_stock.field_stock_move_line__last_scanned
+msgid "Indica si esta línea fue la última en ser escaneada (para resaltado visual)"
+msgstr "Indica si esta línea fue la última en ser escaneada (para resaltado visual)"
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_move_line.py:0
+#, python-format
+msgid "This barcode %s is not related to any product."
+msgstr "Este código de barras %s no está relacionado con ningún producto."
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_move_line.py:0
+#, python-format
+msgid "No lines found to process."
+msgstr "No se encontraron líneas para procesar."
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_move_line.py:0
+#, python-format
+msgid "Lines must belong to a picking."
+msgstr "Las líneas deben pertenecer a una orden de picking."
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_move_line.py:0
+#, python-format
+msgid "This product %s with barcode %s is not present in this picking."
+msgstr "Este producto %s con código de barras %s no está presente en esta orden de picking."
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_move_line.py:0
+#: code:addons/barcode_stock/models/stock_picking.py:0
+#, python-format
+msgid "⚠️ Cantidad excedida para:\nProducto: %s\nCantidad ordenada: %s\nUbicación: %s"
+msgstr "⚠️ Cantidad excedida para:\nProducto: %s\nCantidad ordenada: %s\nUbicación: %s"
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_picking.py:0
+#, python-format
+msgid "Please enable \"Pre-fill Detailed Operations\" or disable \"Show Detailed Operations\" in Operation Type \"%s\" for better scanning experiance https://prnt.sc/M3hSpW5XLWaF ."
+msgstr "Por favor habilite \"Pre-llenar Operaciones Detalladas\" o deshabilite \"Mostrar Operaciones Detalladas\" en el Tipo de Operación \"%s\" para una mejor experiencia de escaneo https://prnt.sc/M3hSpW5XLWaF ."
+
+#. module: barcode_stock
+#: code:addons/barcode_stock/models/stock_picking.py:0
+#, python-format
+msgid "Scanned product %s with barcode %s is present in this picking but currently in \"%s\" state."
+msgstr "El producto escaneado %s con código de barras %s está presente en esta orden pero actualmente en estado \"%s\"."
+
+#. module: barcode_stock
+#: model:ir.model,name:barcode_stock.model_stock_move_line
+msgid "Product Moves (Stock Move Line)"
+msgstr "Movimientos de Producto (Línea de Movimiento de Stock)"
+
+#. module: barcode_stock
+#: model:ir.model,name:barcode_stock.model_stock_move
+msgid "Stock Move"
+msgstr "Movimiento de Stock"
+
+#. module: barcode_stock
+#: model:ir.model,name:barcode_stock.model_stock_picking
+msgid "Transfer"
+msgstr "Transferencia"
+
+#. module: barcode_stock
+#: model_terms:ir.ui.view,arch_db:barcode_stock.view_picking_form_inherit_barcode_sale
+msgid "Barcode Scanned"
+msgstr "Código de Barras Escaneado"

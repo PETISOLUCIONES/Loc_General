@@ -17,7 +17,7 @@
   "name"                 :  "Inventory Barcode Scanning",
   "summary"              :  """The module allows you to scan the product barcode and update the quantity of stock in Odoo inventory.""",
   "category"             :  "Warehouse",
-  "version"              :  "1.0.2",
+  "version"              :  "1.0.3",
   "sequence"             :  "10",
   "author"               :  "Webkul Software Pvt. Ltd.",
   "license"              :  "Other proprietary",
@@ -30,7 +30,16 @@ Odoo Scan products to stock in Odoo
 Scan barcode in Odoo""",
   "live_test_url"        :  "http://odoodemo.webkul.com/?module=barcode_stock",
   "depends"              :  ['stock'],
-  "data"                 :  ['views/stock_picking_views.xml'],
+  "data"                 :  [
+        'views/stock_picking_views.xml',
+        'views/stock_move_line_views.xml',
+        'views/stock_move_views.xml',
+    ],
+  "assets"               :  {
+        'web.assets_backend': [
+            'barcode_stock/static/src/barcode_list_controller.js',
+        ],
+    },
   "images"               :  ['static/description/Banner.png'],
   "application"          :  True,
   "price"                :  15,

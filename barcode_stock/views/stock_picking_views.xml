@@ -11,6 +11,13 @@
             <notebook position="after">
                 <field name="_barcode_scanned" widget="barcode_handler"/>
             </notebook>
+            <xpath expr="//field[@name='move_ids_without_package']//tree/field[1]" position="before">
+                <field name="last_scanned" invisible="1" column_invisible="1"/>
+                <field name="is_scanned" invisible="1" column_invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']//tree" position="attributes">
+                <attribute name="decoration-success">last_scanned</attribute>
+            </xpath>
         </field>
     </record>
 </odoo>

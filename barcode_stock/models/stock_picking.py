@@ -30,21 +30,59 @@ class StockPicking(models.Model):
                 raise UserError(
                     _('Please enable "Pre-fill Detailed Operations" or disable "Show Detailed Operations" in Operation Type "%s" for better scanning experiance https://prnt.sc/M3hSpW5XLWaF .'%(self.picking_type_id.display_name)))
             if moveLineObjs and operation_on=='move_line':
+                # Resetear last_scanned de todas las líneas del picking
+                self.move_line_ids_without_package.write({'last_scanned': False})
+
                 for moveLineObj in moveLineObjs:
-                    if moveLineObj.quantity < moveLineObj.move_id.product_uom_qty:
+                    # Si no ha sido escaneado, inicializar quantity a 1 y marcar como escaneado
+                    if not moveLineObj.is_scanned:
+                        moveLineObj.quantity = 1
+                        moveLineObj.is_scanned = True
+                        moveLineObj.last_scanned = True
+                        break
+                    # Si ya fue escaneado, incrementar si no excede el límite
+                    elif moveLineObj.quantity < moveLineObj.move_id.product_uom_qty:
                         moveLineObj.quantity += 1
+                        moveLineObj.last_scanned = True
                         break
                     elif moveLineObj == moveLineObjs[-1]:
                         raise UserError(
-                            _('You are trying to deliver quantity more than ordered.'))
+                            _('⚠️ Cantidad excedida para:\n'
+                              'Producto: %s\n'
+                              'Cantidad ordenada: %s\n'
+                              'Ubicación: %s') % (
+                                moveLineObj.product_id.display_name,
+                                moveLineObj.move_id.product_uom_qty,
+                                moveLineObj.location_id.complete_name or moveLineObj.location_id.name
+                            )
+                        )
             elif moveObjs and operation_on=='move':
+                # Resetear last_scanned de todos los movimientos del picking
+                self.move_ids_without_package.write({'last_scanned': False})
+
                 for moveObj in moveObjs:
-                    if moveObj.quantity < moveObj.product_uom_qty:
+                    # Si no ha sido escaneado, inicializar quantity a 1 y marcar como escaneado
+                    if not moveObj.is_scanned:
+                        moveObj.quantity = 1
+                        moveObj.is_scanned = True
+                        moveObj.last_scanned = True
+                        break
+                    # Si ya fue escaneado, incrementar si no excede el límite
+                    elif moveObj.quantity < moveObj.product_uom_qty:
                         moveObj.quantity += 1
+                        moveObj.last_scanned = True
                         break
                     elif moveObj == moveObjs[-1]:
                         raise UserError(
-                            _('You are trying to deliver quantity more than ordered.'))
+                            _('⚠️ Cantidad excedida para:\n'
+                              'Producto: %s\n'
+                              'Cantidad ordenada: %s\n'
+                              'Ubicación: %s') % (
+                                moveObj.product_id.display_name,
+                                moveObj.product_uom_qty,
+                                moveObj.location_id.complete_name or moveObj.location_id.name
+                            )
+                        )
             elif moveObjs:
                 stateLabel = dict(
                     self.move_line_ids_without_package.fields_get('state')['state']['selection']).get(
