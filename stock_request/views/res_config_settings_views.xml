@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
+<!--
+    Copyright 2018 Creu Blanca
+    License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
+-->
 <odoo>
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.stock_request</field>
@@ -57,6 +60,17 @@
                                 <div
                                     class="text-muted"
                                 >By default, available stock is not used</div>
+                            </div>
+                        </setting>
+                        <setting>
+                            <field
+                                name="check_order_requested_by"
+                                string="Check Stock Request Order requested by"
+                            />
+                            <div class="content-group">
+                                <div
+                                    class="text-muted"
+                                >Only the user who submitted the request will be able to edit the stock request order.</div>
                             </div>
                         </setting>
                     </block>

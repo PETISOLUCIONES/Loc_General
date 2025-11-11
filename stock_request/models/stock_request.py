@@ -1,3 +1,5 @@
+# Copyright 2017-2020 ForgeFlow, S.L.
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -194,6 +196,11 @@ class StockRequest(models.Model):
 
     @api.constrains("order_id", "requested_by")
     def check_order_requested_by(self):
+        check_order_requested_by = (
+            self.env.company.stock_request_check_order_requested_by
+        )
+        if not check_order_requested_by:
+            return
         for stock_request in self:
             if (
                 stock_request.order_id

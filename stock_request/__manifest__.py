@@ -1,11 +1,14 @@
-# -*- coding: utf-8 -*-
+# Copyright 2017-2021 ForgeFlow, S.L.
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
+
 {
     "name": "Stock Request",
     "summary": "Internal request for stock",
-    "version": "17.0.1.1.3",
+    "version": "17.0.1.1.6",
     "license": "LGPL-3",
-    "website": "http://www.peti.com.co",
-    "author": "PETI Soluciones Productivas",
+    "website": "https://github.com/OCA/stock-logistics-request",
+    "author": "ForgeFlow, Odoo Community Association (OCA)",
+    "maintainers": ["LoisRForgeFlow", "etobella"],
     "category": "Warehouse Management",
     "depends": ["stock"],
     "data": [

@@ -1,4 +1,5 @@
-
+# Copyright 2018 Creu Blanca
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import api, fields, models
 
@@ -34,6 +35,10 @@ class ResConfigSettings(models.TransientModel):
     )
 
     module_stock_request_mrp = fields.Boolean(string="Stock Request for Manufacturing")
+    check_order_requested_by = fields.Boolean(
+        related="company_id.stock_request_check_order_requested_by",
+        readonly=False,
+    )
 
     # Dependencies
     @api.onchange("stock_request_allow_virtual_loc")
