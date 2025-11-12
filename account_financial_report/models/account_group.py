@@ -65,3 +65,9 @@ class AccountGroup(models.Model):
             one.compute_account_ids = (
                 one.account_ids | one.group_child_ids.compute_account_ids
             )
+
+    @api.model
+    def create(self, vals):
+        records = super().create(vals)
+        records._compute_level()
+        return records
