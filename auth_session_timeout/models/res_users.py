@@ -82,7 +82,7 @@ class ResUsers(models.Model):
 
         # Try to terminate the session
         terminated = False
-        if expired and self.env.user.rol_web == 'cliente':
+        if expired and self.env.user.has_group('base.group_portal'):
             terminated = self._auth_timeout_session_terminate(session)
 
         # If session terminated, all done
