@@ -15,7 +15,7 @@
             </tree>
             <!-- Agregar el campo last_scanned invisible para que la decoración funcione -->
             <xpath expr="//tree/field[1]" position="before">
-                <field name="last_scanned" invisible="1"/>
+                <field name="last_scanned" invisible="1" column_invisible="1"/>
             </xpath>
         </field>
     </record>

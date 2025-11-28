@@ -29,11 +29,12 @@ Add product to inventory
 Odoo Scan products to stock in Odoo
 Scan barcode in Odoo""",
   "live_test_url"        :  "http://odoodemo.webkul.com/?module=barcode_stock",
-  "depends"              :  ['stock'],
+  "depends"              :  ['stock', 'stock_picking_batch'],
   "data"                 :  [
         'views/stock_picking_views.xml',
         'views/stock_move_line_views.xml',
         'views/stock_move_views.xml',
+        'views/stock_picking_batch_views.xml',
     ],
   "assets"               :  {
         'web.assets_backend': [
