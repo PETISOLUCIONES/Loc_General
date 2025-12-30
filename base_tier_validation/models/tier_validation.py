@@ -180,15 +180,7 @@ class TierValidation(models.AbstractModel):
         """Override for different validation policy."""
         if not reviews:
             return False
-
-        # Normalizar a recordset
-        if isinstance(reviews, dict):
-            reviews = self.env['tier.review'].browse(reviews.get('ids', []))
-
-        # Asegurar recordset válido
-        reviews = reviews.filtered(lambda r: r.exists())
-
-        return not any(s != "approved" for s in reviews.mapped("status"))
+        return not any([s != "approved" for s in reviews.mapped("status")])
 
     @api.model
     def _calc_reviews_rejected(self, reviews):
@@ -273,15 +265,7 @@ class TierValidation(models.AbstractModel):
 
     def _validate_tier(self, tiers=False):
         self.ensure_one()
-        if tiers:
-            # Si llega como dict o lista, forzamos recordset
-            if isinstance(tiers, dict):
-                tier_reviews = self.env['tier.review'].browse(tiers.get('ids', []))
-            else:
-                tier_reviews = tiers
-        else:
-            tier_reviews = self.review_ids
-
+        tier_reviews = tiers or self.review_ids
         user_reviews = tier_reviews.filtered(
             lambda r: r.status == "pending" and (self.env.user in r.reviewer_ids)
         )
