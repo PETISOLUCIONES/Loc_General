@@ -6,7 +6,6 @@
     'author': 'PETI SOLUCIONES PRODUCTIVAS S.A.S',
     'depends': ['facturacion_electronica', 'queue_job'],
     'data': [
-        'data/queue_job_channel_data.xml',
         'data/ir_cron_data.xml',
     ],
     'installable': True,
