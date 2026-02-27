@@ -10,7 +10,7 @@ class AccountMove(models.Model):
         """
         # Si la configuración de envío automático está activa, usar action_post1
         res = super(AccountMove, self).action_post()
-        if not self.company_id.auto_send_dian and self.move_type in ['out_invoice']:
+        if not self.company_id.auto_send_dian and self.move_type in ['out_invoice'] and self.subscription_order_id:
             self.with_delay(
                     channel="root",
                     description="DIAN send %s" % (self.name or self.id),
