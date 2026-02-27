@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="channel_dian" model="queue.job.channel">
+        <field name="name">dian</field>
+    </record>
+</odoo>
