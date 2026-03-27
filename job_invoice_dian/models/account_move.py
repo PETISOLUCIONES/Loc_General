@@ -30,7 +30,7 @@ class AccountMove(models.Model):
             ('model_name', '=', 'account.move'),
             ('method_name', '=', 'action_post1'),
             ('channel', '=', 'root'),
-            ('state', 'in', ['pending', 'enqueued', 'started']),
+            ('state', 'in', ['pending', 'enqueued', 'started', 'done']),
         ])
         already_queued_ids = [rid for job in active_jobs for rid in job.record_ids]
 
