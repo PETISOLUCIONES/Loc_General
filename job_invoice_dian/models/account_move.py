@@ -15,7 +15,7 @@ class AccountMove(models.Model):
                     channel="root",
                     description="DIAN send %s" % (self.name or self.id),
                     priority=0,
-                    max_retries=10,).action_post1()
+                    max_retries=1,).action_post1()
         return res
 
     def _cron_requeue_failed_dian_jobs(self):
@@ -46,5 +46,5 @@ class AccountMove(models.Model):
                 channel="root",
                 description="DIAN retry %s" % invoice.name,
                 priority=0,
-                max_retries=10,
+                max_retries=1,
             ).action_post1()
