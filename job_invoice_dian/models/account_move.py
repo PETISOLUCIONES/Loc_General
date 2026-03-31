@@ -11,11 +11,13 @@ class AccountMove(models.Model):
         # Si la configuración de envío automático está activa, usar action_post1
         res = super(AccountMove, self).action_post()
         if not self.company_id.auto_send_dian and self.move_type in ['out_invoice'] and self.subscription_order_id:
-            self.with_delay(
-                    channel="root",
-                    description="DIAN send %s" % (self.name or self.id),
-                    priority=0,
-                    max_retries=1,).action_post1()
+            # Revisa que el action_post haya sido llamado desde un proceso de colas
+            if not self.env.context.get('not_queue'):
+                self.with_delay(
+                        channel="root",
+                        description="DIAN send %s" % (self.name or self.id),
+                        priority=0,
+                        max_retries=1,).action_post1()
         return res
 
     def _cron_requeue_failed_dian_jobs(self):
