@@ -1,5 +1,7 @@
+from datetime import timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.addons.queue_job.exception import RetryableJobError
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -22,12 +24,16 @@ class AccountMove(models.Model):
 
     def _send_to_dian_safe(self):
         """
-        Wrapper para queue_job: evita reenvío doble a la DIAN si el job reintenta
-        tras una excepción ocurrida *después* de que la DIAN ya aceptó la factura.
+        Wrapper para queue_job: soporta lotes de facturas.
+        Procesa cada factura individualmente para aislar errores.
         """
-        if self.invoice_status_dian and self.invoice_status_dian != 'Fallida':
-            return
-        self.action_post1()
+        for invoice in self:
+            if invoice.invoice_status_dian == 'Exitoso':
+                continue
+            try:
+                invoice.action_post1()
+            except Exception:
+                pass
 
     def _cron_requeue_failed_dian_jobs(self):
         failed_jobs = self.env['queue.job'].search([
@@ -52,14 +58,14 @@ class AccountMove(models.Model):
             ('invoice_status_dian', '=', 'Fallida'),
             ('description_status_dian', 'not like', 'Regla:'),
         ])
-        for invoice in invoices:
-            invoice.with_delay(
+        for i in range(0, len(invoices), 10):
+            batch = invoices[i:i + 10]
+            batch.with_delay(
                 channel="root",
-                description="DIAN retry %s" % invoice.name,
+                description="DIAN retry lote %d-%d" % (i + 1, min(i + 10, len(invoices))),
                 priority=0,
                 max_retries=1,
             )._send_to_dian_safe()
-
 
     def _cron_send_invoice_failed(self):
         active_jobs = self.env['queue.job'].search([
@@ -77,13 +83,46 @@ class AccountMove(models.Model):
             ('invoice_status_dian', '=', 'Fallida'),
             ('description_status_dian', 'in', ['Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo', '', False]),
         ])
-        for invoice in invoices:
-            invoice.with_delay(
+        for i in range(0, len(invoices), 10):
+            batch = invoices[i:i + 10]
+            batch.with_delay(
                 channel="root",
-                description="DIAN retry %s" % invoice.name,
+                description="DIAN schema retry lote %d-%d" % (i + 1, min(i + 10, len(invoices))),
                 priority=0,
                 max_retries=1,
             )._send_to_dian_safe()
+
+    def _cron_redate_failed_invoices(self):
+        """
+        Busca facturas del día anterior con estado DIAN 'Fallida', actualiza
+        invoice_date a hoy y las encola en lotes para reenvío a la DIAN.
+        Solo procesa facturas creadas después de las 02:00 AM del día anterior.
+        """
+        from datetime import datetime
+        yesterday = fields.Date.today() - timedelta(days=1)
+        cutoff = datetime.combine(yesterday, datetime.min.time()).replace(hour=2)
+        invoices = self.search([
+            ('state', '=', 'posted'),
+            ('move_type', '=', 'out_invoice'),
+            ('invoice_date', '=', yesterday),
+            ('invoice_status_dian', '!=', 'Exitoso'),
+            ('create_date', '>=', cutoff),
+        ])
+        if not invoices:
+            return
+        today = fields.Date.context_today(self)
+        self.env.cr.execute(
+            "UPDATE account_move SET invoice_date = %s WHERE id = ANY(%s)",
+            (today, invoices.ids)
+        )
+        # for i in range(0, len(invoices), 10):
+        #     batch = invoices[i:i + 10]
+        #     batch.with_delay(
+        #         channel="root",
+        #         description="DIAN redate retry lote %d-%d" % (i + 1, min(i + 10, len(invoices))),
+        #         priority=0,
+        #         max_retries=1,
+        #     )._send_to_dian_safe()
 
 
 

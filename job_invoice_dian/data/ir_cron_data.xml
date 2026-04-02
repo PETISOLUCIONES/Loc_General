@@ -32,5 +32,16 @@
             <field name="numbercall">-1</field>
             <field name="active">False</field>
         </record>
+        <record id="ir_cron_redate_failed_invoices" model="ir.cron">
+            <field name="name">DIAN: Actualizar fecha de facturas fallidas del día anterior</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_redate_failed_invoices()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall">2026-05-02 05:00:10</field>
+            <field name="active">False</field>
+        </record>
     </data>
 </odoo>
