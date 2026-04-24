@@ -154,106 +154,214 @@ class AgedPartnerBalanceReport(models.AbstractModel):
         only_posted_moves,
         show_move_line_details,
     ):
-        domain = self._get_move_lines_domain_not_reconciled(
-            company_id, account_ids, partner_ids, only_posted_moves, date_from
+
+        sql = """
+        WITH aml_base AS (
+
+            SELECT
+                aml.account_id,
+                COALESCE(aml.partner_id,0) AS partner_id,
+                aml.amount_residual AS residual,
+                COALESCE(
+                    aml.date_maturity,
+                    aml.date
+                ) AS due_date
+
+            FROM account_move_line aml
+            JOIN account_move am
+                ON am.id = aml.move_id
+
+            WHERE
+                aml.company_id = %(company)s
+                AND aml.date <= %(date_at)s
+                AND aml.amount_residual <> 0
+        """
+
+        params = {
+            "company": company_id,
+            "date_at": date_at_object,
+        }
+
+        if only_posted_moves:
+            sql += """
+                AND am.state='posted'
+            """
+
+        if account_ids:
+            sql += """
+                AND aml.account_id = ANY(%(accounts)s)
+            """
+            params["accounts"] = list(account_ids)
+
+        if partner_ids:
+            sql += """
+                AND aml.partner_id = ANY(%(partners)s)
+            """
+            params["partners"] = list(partner_ids)
+
+        if date_from:
+            sql += """
+                AND aml.date >= %(date_from)s
+            """
+            params["date_from"] = date_from
+
+        sql += """
         )
-        ml_fields = self._get_ml_fields()
-        line_model = self.env["account.move.line"]
-        move_lines = line_model.search_read(domain=domain, fields=ml_fields)
-        journals_ids = set()
-        partners_ids = set()
-        partners_data = {}
+
+        SELECT
+
+            account_id,
+            partner_id,
+
+            SUM(residual) residual,
+
+            SUM(
+                CASE
+                    WHEN due_date >= %(date_at)s
+                    THEN residual
+                    ELSE 0
+                END
+            ) current_bucket,
+
+            SUM(
+                CASE
+                    WHEN (%(date_at)s::date - due_date::date)
+                        BETWEEN 1 AND 30
+                    THEN residual
+                    ELSE 0
+                END
+            ) bucket30,
+
+            SUM(
+                CASE
+                    WHEN (%(date_at)s::date - due_date::date)
+                        BETWEEN 31 AND 60
+                    THEN residual
+                    ELSE 0
+                END
+            ) bucket60,
+
+            SUM(
+                CASE
+                    WHEN (%(date_at)s::date - due_date::date)
+                        BETWEEN 61 AND 90
+                    THEN residual
+                    ELSE 0
+                END
+            ) bucket90,
+
+            SUM(
+                CASE
+                    WHEN (%(date_at)s::date - due_date::date)
+                        BETWEEN 91 AND 120
+                    THEN residual
+                    ELSE 0
+                END
+            ) bucket120,
+
+            SUM(
+                CASE
+                    WHEN (%(date_at)s::date - due_date::date) > 120
+                    THEN residual
+                    ELSE 0
+                END
+            ) bucket_older
+
+        FROM aml_base
+
+        GROUP BY
+            account_id,
+            partner_id
+
+        HAVING SUM(residual) <> 0
+
+        ORDER BY
+            account_id,
+            partner_id
+        """
+
+        self.env.cr.execute(sql, params)
+        rows = self.env.cr.dictfetchall()
+
         ag_pb_data = {}
-        if date_at_object < date.today():
-            (
-                acc_partial_rec,
-                debit_amount,
-                credit_amount,
-                debit_amount_currency,
-                credit_amount_currency,
-            ) = self._get_account_partial_reconciled(company_id, date_at_object)
-            if acc_partial_rec:
-                ml_ids = list(map(operator.itemgetter("id"), move_lines))
-                debit_ids = list(
-                    map(operator.itemgetter("debit_move_id"), acc_partial_rec)
-                )
-                credit_ids = list(
-                    map(operator.itemgetter("credit_move_id"), acc_partial_rec)
-                )
-                move_lines = self._recalculate_move_lines(
-                    move_lines,
-                    debit_ids,
-                    credit_ids,
-                    debit_amount,
-                    credit_amount,
-                    ml_ids,
-                    account_ids,
-                    company_id,
-                    partner_ids,
-                    only_posted_moves,
-                    debit_amount_currency,
-                    credit_amount_currency,
-                )
-        move_lines = [
-            move_line
-            for move_line in move_lines
-            if move_line["date"] <= date_at_object
-            and not float_is_zero(move_line["amount_residual"], precision_digits=2)
+        partner_map = set()
+        journal_data = {}
+
+        for r in rows:
+
+            acc = r["account_id"]
+            prt = r["partner_id"]
+
+            if acc not in ag_pb_data:
+                ag_pb_data[acc] = {
+                    "id": acc,
+                    "residual": 0.0,
+                    "current": 0.0,
+                    "30_days": 0.0,
+                    "60_days": 0.0,
+                    "90_days": 0.0,
+                    "120_days": 0.0,
+                    "older": 0.0,
+                }
+
+            # Totales por cuenta
+            ag_pb_data[acc]["residual"] += r["residual"]
+            ag_pb_data[acc]["current"] += r["current_bucket"]
+            ag_pb_data[acc]["30_days"] += r["bucket30"]
+            ag_pb_data[acc]["60_days"] += r["bucket60"]
+            ag_pb_data[acc]["90_days"] += r["bucket90"]
+            ag_pb_data[acc]["120_days"] += r["bucket120"]
+            ag_pb_data[acc]["older"] += r["bucket_older"]
+
+            # Datos por partner
+            ag_pb_data[acc][prt] = {
+                "id": prt,
+                "residual": r["residual"],
+                "current": r["current_bucket"],
+                "30_days": r["bucket30"],
+                "60_days": r["bucket60"],
+                "90_days": r["bucket90"],
+                "120_days": r["bucket120"],
+                "older": r["bucket_older"],
+                "move_lines": [],  # detalles opcionales
+            }
+
+            partner_map.add(prt)
+
+        # Datos cuentas
+        accounts_data = self._get_accounts_data(
+            ag_pb_data.keys()
+        )
+
+        # Datos partners
+        partners_data = {
+            0: {
+                "id": 0,
+                "name": "",
+            }
+        }
+
+        real_partner_ids = [
+            p for p in partner_map if p
         ]
-        for move_line in move_lines:
-            journals_ids.add(move_line["journal_id"][0])
-            acc_id = move_line["account_id"][0]
-            if move_line["partner_id"]:
-                prt_id = move_line["partner_id"][0]
-                prt_name = move_line["partner_id"][1]
-            else:
-                prt_id = 0
-                prt_name = ""
-            if prt_id not in partners_ids:
-                partners_data.update({prt_id: {"id": prt_id, "name": prt_name}})
-                partners_ids.add(prt_id)
-            if acc_id not in ag_pb_data.keys():
-                ag_pb_data = self._initialize_account(ag_pb_data, acc_id)
-            if prt_id not in ag_pb_data[acc_id]:
-                ag_pb_data = self._initialize_partner(ag_pb_data, acc_id, prt_id)
-            move_line_data = {}
-            if show_move_line_details:
-                if move_line["ref"] == move_line["name"]:
-                    if move_line["ref"]:
-                        ref_label = move_line["ref"]
-                    else:
-                        ref_label = ""
-                elif not move_line["ref"]:
-                    ref_label = move_line["name"]
-                elif not move_line["name"]:
-                    ref_label = move_line["ref"]
-                else:
-                    ref_label = move_line["ref"] + " - " + move_line["name"]
-                move_line_data.update(
-                    {
-                        "line_rec": line_model.browse(move_line["id"]),
-                        "date": move_line["date"],
-                        "entry": move_line["move_id"][1],
-                        "jnl_id": move_line["journal_id"][0],
-                        "acc_id": acc_id,
-                        "partner": prt_name,
-                        "ref_label": ref_label,
-                        "due_date": move_line["date_maturity"],
-                        "residual": move_line["amount_residual"],
-                    }
-                )
-                ag_pb_data[acc_id][prt_id]["move_lines"].append(move_line_data)
-            ag_pb_data = self._calculate_amounts(
-                ag_pb_data,
-                acc_id,
-                prt_id,
-                move_line["amount_residual"],
-                move_line["date_maturity"],
-                date_at_object,
+
+        if real_partner_ids:
+            partners = self.env["res.partner"].browse(
+                real_partner_ids
             )
-        journals_data = self._get_journals_data(list(journals_ids))
-        accounts_data = self._get_accounts_data(ag_pb_data.keys())
-        return ag_pb_data, accounts_data, partners_data, journals_data
+
+            for p in partners:
+                partners_data[p.id] = {
+                    "id": p.id,
+                    "name": p.display_name,
+                }
+
+        return (
+            ag_pb_data,
+            accounts_data,
+            partners_data,
+            journal_data,
+        )
 
     @api.model
     def _compute_maturity_date(self, ml, date_at_object):

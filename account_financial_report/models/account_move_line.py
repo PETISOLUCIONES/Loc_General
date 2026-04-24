@@ -47,29 +47,40 @@ class AccountMoveLine(models.Model):
             ]
 
     def init(self):
-        """
-            The join between accounts_partners subquery and account_move_line
-            can be heavy to compute on big databases.
-            Join sample:
-                JOIN
-                    account_move_line ml
-                        ON ap.account_id = ml.account_id
-                        AND ml.date < '2018-12-30'
-                        AND ap.partner_id = ml.partner_id
-                        AND ap.include_initial_balance = TRUE
-            By adding the following index, performances are strongly increased.
-        :return:
-        """
-        self._cr.execute(
-            "SELECT indexname FROM pg_indexes WHERE indexname = " "%s",
-            ("account_move_line_account_id_partner_id_index",),
-        )
-        if not self._cr.fetchone():
-            self._cr.execute(
-                """
-            CREATE INDEX account_move_line_account_id_partner_id_index
-            ON account_move_line (account_id, partner_id)"""
-            )
+        cr = self._cr
+
+        cr.execute("""
+                   CREATE INDEX IF NOT EXISTS
+                       aml_aged_report_idx
+                       ON account_move_line(
+                       company_id,
+                       date,
+                       account_id,
+                       partner_id,
+                       date_maturity
+                       )
+                   """)
+
+        cr.execute("""
+                   CREATE INDEX IF NOT EXISTS
+                       aml_open_items_partial_idx
+                       ON account_move_line(
+                       company_id,
+                       date,
+                       account_id,
+                       partner_id
+                       )
+                       WHERE amount_residual<>0
+                   """)
+
+        cr.execute("""
+                   CREATE INDEX IF NOT EXISTS
+                       am_state_idx
+                       ON account_move(state)
+                   """)
+
+        cr.execute("ANALYZE account_move_line")
+
 
     @api.model
     def search_count(self, domain, limit=None):
