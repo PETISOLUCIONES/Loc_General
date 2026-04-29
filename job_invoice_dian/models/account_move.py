@@ -83,7 +83,7 @@ class AccountMove(models.Model):
             ('id', 'not in', already_queued_ids),
             ('state', '=', 'posted'),
             ('move_type', '=', 'out_invoice'),
-            ('invoice_status_dian', 'in', ['Fallida',False,'']),
+            ('invoice_status_dian', '=', 'Fallida'),
             ('description_status_dian', 'in', ['Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo', '', False]),
         ])
         for i in range(0, len(invoices), 10):
