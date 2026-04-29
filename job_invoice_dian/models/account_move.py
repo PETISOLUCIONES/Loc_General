@@ -2,6 +2,9 @@ from datetime import timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.addons.queue_job.exception import RetryableJobError
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -32,8 +35,8 @@ class AccountMove(models.Model):
                 continue
             try:
                 invoice.action_post1()
-            except Exception:
-                pass
+            except Exception as e:
+                _logger.exception(f"Error en factura {invoice.id}: {str(e)}")
 
     def _cron_requeue_failed_dian_jobs(self):
         failed_jobs = self.env['queue.job'].search([
