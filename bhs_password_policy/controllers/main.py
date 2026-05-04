@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 
 
 class PasswordSecurityHome(AuthSignupHome):
-    def do_signup(self, qcontext):
+    def do_signup(self, qcontext, *, validate_email=False):
         """Check whether the password complies with policy when signup or reset password"""
 
         password = qcontext.get("password")
