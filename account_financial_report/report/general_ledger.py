@@ -23,6 +23,14 @@ class GeneralLedgerReport(models.AbstractModel):
             analytic_data.update({account.id: {"name": account.name}})
         return analytic_data
 
+    def _get_analytic_ids_from_key(self, analytic_key):
+        ids = []
+        for single_id in str(analytic_key).split(","):
+            single_id = single_id.strip()
+            if single_id.isdigit():
+                ids.append(int(single_id))
+        return ids
+
     def _get_taxes_data(self, taxes_ids):
         taxes = self.env["account.tax"].browse(taxes_ids)
         taxes_data = {}
@@ -471,7 +479,10 @@ class GeneralLedgerReport(models.AbstractModel):
             for tax_id in move_line["tax_ids"]:
                 taxes_ids.add(tax_id)
             for analytic_account in move_line["analytic_distribution"] or {}:
-                analytic_ids.add(int(analytic_account))
+                for single_id in str(analytic_account).split(","):
+                    single_id = single_id.strip()
+                    if single_id.isdigit():
+                        analytic_ids.add(int(single_id))
             if move_line["full_reconcile_id"]:
                 rec_id = move_line["full_reconcile_id"][0]
                 if rec_id not in full_reconcile_ids:

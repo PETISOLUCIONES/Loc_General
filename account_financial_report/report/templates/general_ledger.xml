@@ -476,32 +476,25 @@
                         </t>
                     </div>
                     <!--## cost_center-->
-                    <t t-if="show_cost_center">
-                        <div class="act_as_cell left">
-                            <t
-                                t-foreach="line['analytic_distribution']"
-                                t-as="analytic_id"
-                            >
-                                <div>
-                                    <span
-                                        t-att-res-id="analytic_id"
-                                        res-model="account.analytic.account"
-                                        view-type="form"
-                                    >
-                                        <t
-                                            t-esc="o._get_atr_from_dict(int(analytic_id), analytic_data, 'name')"
-                                        />
-                                        <t
-                                            t-if="int(line['analytic_distribution'][analytic_id]) &lt; 100"
-                                        >
-                                            <t
-                                                t-esc="int(line['analytic_distribution'][analytic_id])"
-                                            />%
-                                        </t>
-                                    </span>
-                                </div>
-                            </t>
-                        </div>
+                    <!-- DESPUÉS (sin depender de o.) -->
+                    <t
+                        t-foreach="line['analytic_distribution']"
+                        t-as="analytic_id"
+                    >
+                        <t t-foreach="[int(x.strip()) for x in str(analytic_id).split(',') if x.strip().isdigit()]" t-as="single_id">
+                            <div>
+                                <span
+                                    t-att-res-id="single_id"
+                                    res-model="account.analytic.account"
+                                    view-type="form"
+                                >
+                                    <t t-esc="o._get_atr_from_dict(single_id, analytic_data, 'name')"/>
+                                    <t t-if="int(line['analytic_distribution'][analytic_id]) &lt; 100">
+                                        <t t-esc="int(line['analytic_distribution'][analytic_id])"/>%
+                                    </t>
+                                </span>
+                            </div>
+                        </t>
                     </t>
                     <t t-if="show_analytic_tags">
                         <!--## analytic tags-->
