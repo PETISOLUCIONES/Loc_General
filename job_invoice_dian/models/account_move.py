@@ -10,10 +10,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     def action_post(self):
-        """
-        Sobrescribe el método action_post para controlar el envío a DIAN según configuración
-        """
-        # Si la configuración de envío automático está activa, usar action_post1
+        # Si la configuraci�n de env�o autom�tico est� activa, usar action_post1
         res = super(AccountMove, self).action_post()
         if not self.company_id.auto_send_dian and self.move_type in ['out_invoice'] and self.subscription_order_id:
             # Revisa que el action_post haya sido llamado desde un proceso de colas
@@ -96,29 +93,33 @@ class AccountMove(models.Model):
             )._send_to_dian_safe()
 
     def _cron_redate_failed_invoices(self):
-        """
-        Busca facturas del día anterior con estado DIAN 'Fallida', actualiza
-        invoice_date a hoy y las encola en lotes para reenvío a la DIAN.
-        Solo procesa facturas creadas después de las 02:00 AM del día anterior.
-        """
         from datetime import datetime
-        yesterday = fields.Date.today() - timedelta(days=1)
-        cutoff = datetime.combine(yesterday, datetime.min.time()).replace(hour=2)
-        invoices = self.search([
-            ('state', '=', 'posted'),
-            ('move_type', '=', 'out_invoice'),
-            ('invoice_date', '=', yesterday),
-            ('invoice_status_dian', '!=', 'Exitoso'),
-            ('create_date', '>=', cutoff),
-        ])
+
+        today = fields.Date.today()
+        # Calcular los d�as 1 y 2 del mes actual
+        first_day = today.replace(day=1)
+        second_day = today.replace(day=2)
+        target_dates = [first_day, second_day]
+
+        invoices = self.env['account.move']
+        cutoff = datetime.combine(first_day, datetime.min.time()).replace(hour=1)
+        for target_date in target_dates:
+            invoices |= self.search([
+                ('state', '=', 'posted'),
+                ('move_type', '=', 'out_invoice'),
+                ('invoice_date', '=', target_date),
+                ('invoice_status_dian', '!=', 'Exitoso'),
+                ('create_date', '>=', cutoff),('create_uid', '=', 1),
+            ])
+
         if not invoices:
             return
-        today = fields.Date.context_today(self)
+
+        today_date = fields.Date.context_today(self)
         self.env.cr.execute(
             "UPDATE account_move SET invoice_date = %s WHERE id = ANY(%s)",
-            (today, invoices.ids)
-        )
-        # for i in range(0, len(invoices), 10):
+            (today_date, invoices.ids)
+        )        # for i in range(0, len(invoices), 10):
         #     batch = invoices[i:i + 10]
         #     batch.with_delay(
         #         channel="root",
