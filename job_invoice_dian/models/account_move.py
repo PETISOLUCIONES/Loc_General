@@ -47,7 +47,7 @@ class AccountMove(models.Model):
             ('model_name', '=', 'account.move'),
             ('method_name', 'in', ['action_post1', '_send_to_dian_safe']),
             ('channel', '=', 'root'),
-            ('state', 'in', ['pending', 'enqueued', 'started', 'done']),
+            ('state', 'in', ['pending', 'enqueued', 'started']),
         ])
         already_queued_ids = [rid for job in active_jobs for rid in job.record_ids]
 
@@ -55,7 +55,7 @@ class AccountMove(models.Model):
             ('id', 'not in', already_queued_ids),
             ('state', '=', 'posted'),
             ('move_type', 'in', ['out_invoice']),
-            ('invoice_status_dian', '=', 'Fallida'),
+            ('invoice_status_dian', '=', 'Fallida'),('create_uid', '=', 1),
             ('description_status_dian', 'not like', 'Regla:'),
         ])
         for i in range(0, len(invoices), 10):
@@ -81,8 +81,11 @@ class AccountMove(models.Model):
             ('state', '=', 'posted'),
             ('move_type', '=', 'out_invoice'),
             ('invoice_status_dian', '=', 'Fallida'),
-            ('description_status_dian', 'in', ['Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo', '', False]),
-        ])
+            '|', '|', '|',
+            ('description_status_dian', '=', 'Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo'),
+            ('description_status_dian', '=', ''),
+            ('description_status_dian', '=', False),
+            ('description_status_dian', 'ilike', 'Regla: FAD09e, Rechazo: Valida que fecha de'),])
         for i in range(0, len(invoices), 10):
             batch = invoices[i:i + 10]
             batch.with_delay(
@@ -127,6 +130,42 @@ class AccountMove(models.Model):
         #         priority=0,
         #         max_retries=1,
         #     )._send_to_dian_safe()
+
+    def _cron_resend_failed_invoices(self):
+
+        from datetime import datetime
+        active_jobs = self.env['queue.job'].search([
+            ('model_name', '=', 'account.move'),
+            ('method_name', '=', '_send_to_dian_safe'),
+            ('channel', '=', 'root'),
+            ('state', 'in', ['pending', 'enqueued', 'started']),
+        ])
+        already_queued_ids = [rid for job in active_jobs for rid in job.record_ids]
+
+        today = fields.Date.today()
+        # Calcular los d as 1 y 2 del mes actual
+        first_day = today.replace(day=1)
+        second_day = today.replace(day=2)
+        target_dates = [first_day, second_day]
+
+        invoices = self.env['account.move']
+        cutoff = datetime.combine(first_day, datetime.min.time()).replace(hour=1)
+        invoices |= self.search([
+            ('state', '=', 'posted'),('id', 'not in', already_queued_ids),
+            ('move_type', '=', 'out_invoice'),
+            ('invoice_status_dian', '!=', 'Exitoso'),
+            ('create_date', '>=', cutoff), ('create_uid', '=', 1),
+        ])
+        if not invoices:
+            return
+        for i in range(0, len(invoices), 10):
+            batch = invoices[i:i + 10]
+            batch.with_delay(
+                channel="root",
+                description="DIAN retry lote no status %d-%d" % (i + 1, min(i + 10, len(invoices))),
+                priority=0,
+                max_retries=1,
+            )._send_to_dian_safe()
 
 
 
