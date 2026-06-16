@@ -123,11 +123,21 @@ class StockRequest(models.Model):
                     _("Stock Request product quantity cannot be negative.")
                 )
 
-    def _get_all_origin_moves(self, move):
+    def _get_all_origin_moves(self, move, visited=None):
+        """
+        Obtiene todos los movimientos origen relacionados de forma recursiva.
+        Se agregó control de movimientos ya visitados para evitar ciclos y
+        prevenir errores de recursión infinita.
+        """
+        if visited is None:
+            visited = set()
+        if move.id in visited:
+            return self.env["stock.move"].browse()
+        visited.add(move.id)
         all_moves = move
         if move.move_orig_ids:
             for orig_move in move.move_orig_ids:
-                all_moves |= self._get_all_origin_moves(orig_move)
+                all_moves |= self._get_all_origin_moves(orig_move, visited)
         return all_moves
 
     @api.depends("allocation_ids", "allocation_ids.stock_move_id")
