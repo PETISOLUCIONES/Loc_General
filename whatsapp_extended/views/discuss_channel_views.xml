@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="whatsapp_discuss_channel_view_tree" model="ir.ui.view">
+            <field name="name">whatsapp.discuss.channel.tree</field>
+            <field name="model">discuss.channel</field>
+            <field name="arch" type="xml">
+                <list string="WA History" create="false" default_order="create_date desc">
+                    <field name="create_date" string="Creado el"/>
+                    <field name="name" string="Participantes"/>
+                    <field name="state" string="Estado" decoration-danger="state in ['expired']" widget="badge"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_whatsapp_discuss_channel" model="ir.actions.act_window">
+            <field name="name">Canales de WhatsApp</field>
+            <field name="res_model">discuss.channel</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem id="menu_whatsapp_discuss_channel_root"
+                  name="Canales"
+                  parent="whatsapp.whatsapp_menu_main"
+                  action="action_whatsapp_discuss_channel"
+                  sequence="2"/>
+
+        <record id="whatsapp_discuss_channel_action_tree" model="ir.actions.act_window.view">
+            <field name="sequence">1</field>
+            <field name="view_mode">list</field>
+            <field name="view_id" ref="whatsapp_extended.whatsapp_discuss_channel_view_tree"/>
+            <field name="act_window_id" ref="whatsapp_extended.action_whatsapp_discuss_channel"/>
+        </record>
+
+        <record model="ir.cron" id="mail_discuss_channel_active">
+            <field name="name">WhatsApp: cerrar canales</field>
+            <field name="model_id" ref="mail.model_discuss_channel"/>
+            <field name="state">code</field>
+            <field name="code">model.close_expired_channels()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>
