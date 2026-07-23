@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright 2020-Today TechKhedut.
-# Part of TechKhedut. See LICENSE file for full copyright and licensing details.
 from datetime import date
 from odoo import models, api
 
@@ -24,7 +22,6 @@ class InvoiceAbstractReport(models.AbstractModel):
         start_date = data.get('form_data').get('start_date')
         end_date = data.get('form_data').get('end_date')
         partner_id = data.get('form_data').get('partner_id')
-
         invoices = self.env['account.move'].search([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
@@ -69,4 +66,13 @@ class InvoiceAbstractReport(models.AbstractModel):
             'partner_country_id': invoices.partner_id[0].country_id.name,
             'today_date': date.today(),
             'currency': currency,
+            'txt_statement_of_account': data.get('txt_statement_of_account', ''),
+            'txt_as_of': data.get('txt_as_of', ''),
+            'txt_invoice_date': data.get('txt_invoice_date', ''),
+            'txt_due_date': data.get('txt_due_date', ''),
+            'txt_invoice': data.get('txt_invoice', ''),
+            'txt_invoice_amount': data.get('txt_invoice_amount', ''),
+            'txt_payment_amount': data.get('txt_payment_amount', ''),
+            'txt_balance_due': data.get('txt_balance_due', ''),
+            'txt_total': data.get('txt_total', ''),
         }

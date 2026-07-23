@@ -3,7 +3,7 @@ from io import BytesIO
 import base64
 from datetime import date
 import xlwt
-from odoo import fields, models
+from odoo import fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -16,11 +16,11 @@ class CustomerStatementWizard(models.TransientModel):
     _description = "Customer Statement Report"
     _rec_name = 'start_date'
 
-    start_date = fields.Date(string="Start Date", required=True)
-    end_date = fields.Date(string="End Date", required=True)
+    start_date = fields.Date(string=_("Start Date"), required=True)
+    end_date = fields.Date(string=_("End Date"), required=True)
     partner_id = fields.Many2one(
         "res.partner",
-        string="Customer",
+        string=_("Customer"),
         required=True,
         domain=[('invoice_ids', '!=', False)]
     )
@@ -32,9 +32,18 @@ class CustomerStatementWizard(models.TransientModel):
         """
         self.ensure_one()
         if self.start_date > self.end_date:
-            raise UserError("Start date cannot be after the end date.")
+            raise UserError(_("Start date cannot be after the end date."))
         data = {
-            'form_data': self.read()[0]
+            'form_data': self.read()[0],
+            'txt_statement_of_account': _('STATEMENT OF ACCOUNT'),
+            'txt_as_of': _('As of'),
+            'txt_invoice_date': _('Invoice Date'),
+            'txt_due_date': _('Due Date'),
+            'txt_invoice': _('Invoice'),
+            'txt_invoice_amount': _('Invoice Amount'),
+            'txt_payment_amount': _('Payment Amount'),
+            'txt_balance_due': _('Balance Due'),
+            'txt_total': _('Total'),
         }
         return self.env.ref('tk_customer_statements.customer_report_template_action').report_action(self, data=data)
 
@@ -123,13 +132,13 @@ class CustomerStatementWizard(models.TransientModel):
             ('move_type', '=', 'out_invoice')
         ])
 
-        sheet1.write_merge(0, 1, 0, 5, 'Statement Of Account', main_head)
-        sheet1.write(7, 0, "Invoice Date", normal_heading)
-        sheet1.write(7, 1, "Due Date", normal_heading)
-        sheet1.write(7, 2, "Invoice", normal_heading)
-        sheet1.write(7, 3, "Invoice Amount", amount_format)
-        sheet1.write(7, 4, "Payment Amount", amount_format)
-        sheet1.write(7, 5, "Balance Due", amount_format)
+        sheet1.write_merge(0, 1, 0, 5, _('Statement Of Account'), main_head)
+        sheet1.write(7, 0, _("Invoice Date"), normal_heading)
+        sheet1.write(7, 1, _("Due Date"), normal_heading)
+        sheet1.write(7, 2, _("Invoice"), normal_heading)
+        sheet1.write(7, 3, _("Invoice Amount"), amount_format)
+        sheet1.write(7, 4, _("Payment Amount"), amount_format)
+        sheet1.write(7, 5, _("Balance Due"), amount_format)
 
         invoice_data = []
         total_amount = 0
@@ -171,9 +180,9 @@ class CustomerStatementWizard(models.TransientModel):
             partner_data += f"{self.partner_id.country_id.name}\n"
 
         sheet1.write_merge(3, 5, 0, 1, partner_data, mege_cell_format)
-        sheet1.write(3, 4, "AS ON", date_currency_format)
+        sheet1.write(3, 4, _("AS ON"), date_currency_format)
         sheet1.write(3, 5, date.today(), date_head)
-        sheet1.write(4, 4, "Currency", date_currency_format)
+        sheet1.write(4, 4, _("Currency"), date_currency_format)
         sheet1.write(4, 5, currency, date_currency_format)
 
         row_start = 8
@@ -187,14 +196,14 @@ class CustomerStatementWizard(models.TransientModel):
             sheet1.row(row_start).height = 300
             row_start += 1
         sheet1.row(row_start).height = 300
-        sheet1.write_merge(row_start, row_start, 0, 2, 'Total', amount_format)
+        sheet1.write_merge(row_start, row_start, 0, 2, _('Total'), amount_format)
         sheet1.write(row_start, 3, round(total_amount, 2), total_format)
         sheet1.write(row_start, 4, round(total_payment, 2), total_format)
         sheet1.write(row_start, 5, round(total_balance, 2), total_format)
 
         stream = BytesIO()
         workbook.save(stream)
-        filename = "Customer Statement Report" + ".xls"
+        filename = _("Customer Statement Report") + ".xls"
         output = base64.encodebytes(stream.getvalue())
         attachment = self.env['ir.attachment'].sudo()
         attachment_id = attachment.create({
