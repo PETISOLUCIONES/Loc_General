@@ -4,7 +4,7 @@
     <template id="customer_report_template">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
-                <h4 style="text-align:center;">STATEMENT OF ACCOUNT</h4>
+                <h4 style="text-align:center;"><t t-esc="txt_statement_of_account"/></h4>
                 <table class="table table-borderless" style="margin-top:20px;">
                     <tr>
                         <td style="width:600px;">
@@ -29,7 +29,7 @@
                             </p>
                         </td>
                         <td rowspan="6">
-                            <span>As of
+                            <span><t t-esc="txt_as_of"/>
                                 <t t-esc="today_date"/>
                             </span>
                         </td>
@@ -39,22 +39,22 @@
                     <thead>
                         <tr style="height:40px;border-bottom:solid 2px black;">
                             <td style="vertical-align: middle;text-align:center;">
-                                <strong>Invoice Date</strong>
+                                <strong><t t-esc="txt_invoice_date"/></strong>
                             </td>
                             <td style="vertical-align: middle;text-align:center;">
-                                <strong>Due Date</strong>
+                                <strong><t t-esc="txt_due_date"/></strong>
                             </td>
                             <td style="vertical-align: middle;text-align:center;">
-                                <strong>Invoice</strong>
+                                <strong><t t-esc="txt_invoice"/></strong>
                             </td>
                             <td style="vertical-align: middle;text-align:right;">
-                                <strong style="margin-right:5px;">Invoice Amount</strong>
+                                <strong style="margin-right:5px;"><t t-esc="txt_invoice_amount"/></strong>
                             </td>
                             <td style="vertical-align: middle;text-align:right;margin-right:10px;">
-                                <strong style="margin-right:5px;">Payment Amount</strong>
+                                <strong style="margin-right:5px;"><t t-esc="txt_payment_amount"/></strong>
                             </td>
                             <td style="vertical-align: middle;text-align:right;margin-right:10px;">
-                                <strong style="margin-right:5px;">Balance Due</strong>
+                                <strong style="margin-right:5px;"><t t-esc="txt_balance_due"/></strong>
                             </td>
                         </tr>
                     </thead>
@@ -87,7 +87,7 @@
                         <!-- Total row -->
                         <tr style="height:40px;">
                             <td colspan="3" style="text-align:right;vertical-align: middle;">
-                                <strong style="margin-right:5px;">Total</strong>
+                                <strong style="margin-right:5px;"><t t-esc="txt_total"/></strong>
                             </td>
                             <td style="text-align:right;vertical-align: middle;">
                                 <strong>

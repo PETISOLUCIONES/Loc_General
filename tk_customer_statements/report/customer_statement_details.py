@@ -66,4 +66,13 @@ class InvoiceAbstractReport(models.AbstractModel):
             'partner_country_id': invoices.partner_id[0].country_id.name,
             'today_date': date.today(),
             'currency': currency,
+            'txt_statement_of_account': data.get('txt_statement_of_account', ''),
+            'txt_as_of': data.get('txt_as_of', ''),
+            'txt_invoice_date': data.get('txt_invoice_date', ''),
+            'txt_due_date': data.get('txt_due_date', ''),
+            'txt_invoice': data.get('txt_invoice', ''),
+            'txt_invoice_amount': data.get('txt_invoice_amount', ''),
+            'txt_payment_amount': data.get('txt_payment_amount', ''),
+            'txt_balance_due': data.get('txt_balance_due', ''),
+            'txt_total': data.get('txt_total', ''),
         }
