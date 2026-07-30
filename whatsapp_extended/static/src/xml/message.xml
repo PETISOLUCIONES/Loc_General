@@ -3,7 +3,13 @@
     <t t-name="MessageExt" t-inherit="mail.Message" t-inherit-mode="extension" owl="1">
 
         <!-- Add Sent, Delivered, Received, Read Status in WhatsApp for Every Message in Discuss, Chatter, Not in Chat Window/Sidebar -->
-        <xpath expr="//div[contains(@class, 'position-relative overflow-x-auto d-inline-block')]" position="inside">
+        <!-- El xpath compara cada clase por separado a proposito. Con un unico
+             contains() sobre la cadena completa, cualquier clase que Odoo
+             inserte en medio rompe la coincidencia: al agregarse
+             `overflow-y-hidden` entre `overflow-x-auto` y `d-inline-block`, el
+             t-inherit fallaba y se caia el render del chatter entero
+             ("cannot be located in element tree"). -->
+        <xpath expr="//div[contains(@class, 'position-relative') and contains(@class, 'overflow-x-auto') and contains(@class, 'd-inline-block')]" position="inside">
             <t t-if="message.wp_status == 'sent'">
                 <div class="o_Message_seenIndicator me-1" t-att-data-tooltip="message.wp_status">
                     <i class="o_MessageSeenIndicator_icon o-first fa fa-check ps-1"/>
@@ -27,7 +33,15 @@
 
         <t t-name="MessageViewNotificationExt" t-inherit="mail.Message.notification" t-inherit-mode="extension" owl="1">
          <!-- Add WhatsApp Icon for Every WhatsApp Message in Discuss, Chatter, Chat Window/Sidebar -->
-                <xpath expr="//div[@t-if='message.originThread?.eq(props.thread) and message.notifications.length > 0']" position="after">
+         <!-- El xpath anterior copiaba literal la condicion del t-if, y Odoo
+              renombro las dos propiedades que usaba:
+                message.originThread -> message.thread
+                message.notifications -> message.notification_ids
+              Se ancla en el ultimo div en lugar de en la condicion. Ademas es
+              obligatorio insertar DESPUES del ultimo: los dos div de esta
+              plantilla forman una cadena t-if / t-elif, y meter un elemento
+              entre ellos dejaria el t-elif huerfano. -->
+                <xpath expr="//div[last()]" position="after">
                     <div>
                         <span t-if="message.isWaMsgs" class="o-mail-Message-notification cursor-pointer me-1" >
                             <i class="fa fa-whatsapp ms-1"/>
