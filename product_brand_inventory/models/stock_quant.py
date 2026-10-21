@@ -26,6 +26,11 @@ class StockQuant(models.Model):
     """Inheriting the model for adding field to stock quant"""
     _inherit = 'stock.quant'
 
-    brand_id = fields.Many2one(related='product_id.brand_id',
-                               string='Brand', store=True, readonly=True,
-                               help="Brand of the product")
+    brand_id = fields.Many2one(
+        'product.brand',
+        related='product_id.product_brand_id',
+        string='Brand',
+        store=True,
+        readonly=True,
+        help="Brand of the product"
+    )
