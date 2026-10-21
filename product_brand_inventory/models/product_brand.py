@@ -23,22 +23,30 @@ from odoo import api, fields, models
 
 
 class ProductBrand(models.Model):
-    """Model for adding brand details"""
-    _name = 'product.brand'
-    _description = "Product brand details"
+    """Inherit product brand to add inventory features and compatibility"""
+    _inherit = 'product.brand'
 
-    name = fields.Char(String="Name", help="Name of the brand")
-    brand_image = fields.Binary(String="Brand Image",
-                                help="Brand image of product")
-    member_ids = fields.One2many('product.template',
-                                 'brand_id',
-                                 string="Products",
-                                 help="Number of Products")
-    product_count = fields.Char(String='Product Count',
-                                help="Number of products",
-                                compute='_compute_product_count', store=True)
+    brand_image = fields.Binary(
+        string="Brand Image",
+        related='logo',
+        readonly=False,
+        help="Brand image of product"
+    )
+    member_ids = fields.One2many(
+        'product.template',
+        'product_brand_id',
+        string="Products",
+        help="Number of Products"
+    )
+    product_count = fields.Integer(
+        string='Product Count',
+        help="Number of products",
+        compute='_compute_product_count',
+        store=False
+    )
 
     @api.depends('member_ids')
     def _compute_product_count(self):
-        """Compute number of product added in product brand"""
-        self.product_count = len(self.member_ids)
+        """Compute number of products in product brand"""
+        for brand in self:
+            brand.product_count = len(brand.member_ids)

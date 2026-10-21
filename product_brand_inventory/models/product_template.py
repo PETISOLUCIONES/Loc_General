@@ -23,8 +23,14 @@ from odoo import fields, models
 
 
 class ProductTemplate(models.Model):
-    """Adding field to product template"""
+    """Adding brand compatibility fields to product template"""
     _inherit = 'product.template'
 
-    brand_id = fields.Many2one('product.brand', string='Brand',
-                               help="Brand of the Product")
+    brand_id = fields.Many2one(
+        'product.brand',
+        related='product_brand_id',
+        string='Brand',
+        readonly=False,
+        store=True,
+        help="Brand of the Product"
+    )
