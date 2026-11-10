@@ -30,7 +30,8 @@ class CvIrCronHistory(models.Model):
 
     error = fields.Text(string='Error', readonly=True, help='Error message if the cron failed.')
 
-    def _register_hook(self):
+    def _register_hook(self)
+    8
         """ Register a hook to automatically set the state to interruption when the server is restarted. """
         history = self.env['cv.ir.cron.history'].sudo().search([('state', '=', 'running')])
         history.write({'state': 'interruption'})
